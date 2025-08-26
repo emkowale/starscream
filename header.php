@@ -1,8 +1,8 @@
 <?php
 /** ===============================
- *  header.php  — The Bear Traxs
- *  - No Woo titles/breadcrumbs here
- *  - Colors & font come from Customizer
+ *  header.php — Starscream
+ *  - Uses Customizer logo (company_logo_id) only
+ *  - No inline CSS; styles live in style.css
  *  =============================== */
 ?><!DOCTYPE html>
 <html <?php language_attributes(); ?>>
@@ -14,14 +14,6 @@
   <link rel="stylesheet"
         href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-  <!-- Small hover tweak; uses your CSS variables -->
-  <style>
-    .header-icons a:hover,
-    .footer-socials a:hover {
-      color: var(--footer-text-color) !important;
-    }
-  </style>
-
   <?php wp_head(); ?>
 </head>
 <body <?php body_class(); ?>>
@@ -29,58 +21,67 @@
 <!-- ===============================
      Site Header
      =============================== -->
-<header
-  style="
-    background-color: <?php echo esc_attr(get_theme_mod('header_bg_color', '#eeeeee')); ?>;
-    color:            <?php echo esc_attr(get_theme_mod('header_footer_text_color', '#000000')); ?>;
-    padding:10px 20px;
-    font-family: <?php echo esc_attr(get_theme_mod('header_footer_font', 'Roboto')); ?>;
-  "
->
+<header class="site-header">
   <!-- Tagline -->
-  <div style="text-align:center; font-size:14px; margin-bottom:5px;">
+  <div class="header-topline">
     <?php bloginfo('description'); ?>
   </div>
 
   <!-- Logo + Actions -->
-  <div style="display:flex; justify-content:space-between; align-items:center;">
+  <div class="header-main">
     <div class="site-logo">
-      <?php if (has_custom_logo()) : ?>
-        <a href="<?php echo esc_url(home_url('/')); ?>">
-          <img
-            src="<?php echo esc_url(wp_get_attachment_url(get_theme_mod('custom_logo'))); ?>"
-            alt="<?php bloginfo('name'); ?>"
-            style="height:100px; width:auto;"
-          >
-        </a>
-      <?php endif; ?>
+      <?php
+      $logo_id = (int) get_theme_mod('company_logo_id', 0);
+      if ($logo_id) {
+          // Prefer attachment alt; fallback to site name
+          $alt = get_post_meta($logo_id, '_wp_attachment_image_alt', true);
+          if (!is_string($alt) || $alt === '') {
+              $alt = get_bloginfo('name', 'display');
+          }
+          echo '<a class="site-logo-link" href="' . esc_url(home_url('/')) . '">';
+          echo wp_get_attachment_image(
+              $logo_id,
+              'full',
+              false,
+              [
+                  'class'     => 'site-logo-img',
+                  'alt'       => esc_attr($alt),
+                  'decoding'  => 'async',
+                  'loading'   => 'eager' // keep header logo snappy
+              ]
+          );
+          echo '</a>';
+      } else {
+          // Text fallback ONLY if no Customizer logo set
+          echo '<a class="site-title" href="' . esc_url(home_url('/')) . '">'
+             . esc_html(get_bloginfo('name', 'display'))
+             . '</a>';
+      }
+      ?>
     </div>
 
-    <div class="header-icons" style="text-align:right;">
-      <a href="/my-account/" aria-label="Account"
-         style="margin-right:15px; color:<?php echo esc_attr(get_theme_mod('accent_color', '#0073aa')); ?>;">
+    <div class="header-icons">
+      <a href="/my-account/" aria-label="Account" class="header-icon-link">
         <i class="fas fa-user"></i>
       </a>
-      <a href="/cart/" aria-label="Cart"
-         style="margin-right:15px; color:<?php echo esc_attr(get_theme_mod('accent_color', '#0073aa')); ?>;">
+      <a href="/cart/" aria-label="Cart" class="header-icon-link">
         <i class="fas fa-shopping-cart"></i>
       </a>
 
       <?php if ($phone = get_theme_mod('phone_number')): ?>
-        <div style="margin-top:5px;">
-          <i class="fas fa-phone" style="color:<?php echo esc_attr(get_theme_mod('accent_color', '#0073aa')); ?>;"></i>
-          <a href="tel:<?php echo preg_replace('/[^0-9+]/', '', $phone); ?>"
-             style="color:<?php echo esc_attr(get_theme_mod('header_footer_text_color', '#000000')); ?>; text-decoration:none;">
+        <div class="header-contact-line">
+          <i class="fas fa-phone header-contact-icon"></i>
+          <a class="header-contact-link"
+             href="tel:<?php echo preg_replace('/[^0-9+]/', '', $phone); ?>">
             <?php echo esc_html($phone); ?>
           </a>
         </div>
       <?php endif; ?>
 
       <?php if ($email = get_theme_mod('email_address')): ?>
-        <div>
-          <i class="fas fa-envelope" style="color:<?php echo esc_attr(get_theme_mod('accent_color', '#0073aa')); ?>;"></i>
-          <a href="mailto:<?php echo esc_attr($email); ?>"
-             style="color:<?php echo esc_attr(get_theme_mod('header_footer_text_color', '#000000')); ?>; text-decoration:none;">
+        <div class="header-contact-line">
+          <i class="fas fa-envelope header-contact-icon"></i>
+          <a class="header-contact-link" href="mailto:<?php echo esc_attr($email); ?>">
             <?php echo esc_html($email); ?>
           </a>
         </div>

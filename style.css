@@ -1,5 +1,5 @@
 /*
-Theme Name: The Bear Traxs Subscription Template
+Theme Name: Starscream
 Theme URI: https://thebeartraxs.com/
 Author: Eric Kowalewski
 Author URI: https://thebeartraxs.com/
@@ -7,7 +7,7 @@ Description: A lightweight, customizable WooCommerce theme built specifically fo
 Version: 1.4.23
 License: GNU General Public License v2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
-Text Domain: thebeartraxs-subscription-template
+Text Domain: starscream
 Tags: ecommerce, woocommerce, minimal
 */
 
@@ -17,8 +17,6 @@ h1,
 .woocommerce-ordering,
 .single-product .product,
 .woocommerce-page .entry-header {
-  margin-left: 20px !important;
-  margin-right: 20px !important;
 }
 
 @media (max-width: 768px){
@@ -97,6 +95,14 @@ header .woocommerce-breadcrumb,
 
 /* Prevent sideways scroll from the 100vw breakout */
 html, body { overflow-x: hidden; }
+
+body {margin: 0px;}
+main{
+  margin-top:10px;
+  margin-left: 10px;
+  margin-right: 10px;
+}
+
 
 /* ====== PRODUCT CARDS (lean; let Woo control columns) ====== */
 .woocommerce ul.products li.product{
@@ -787,4 +793,74 @@ body.woocommerce-checkout .wp-block-woocommerce-checkout-place-order-block {
   /* Slightly larger text on mobile so cards feel “bigger” */
   .btx-card-title { font-size: 1.2rem !important; }
   .btx-card-price { font-size: 1.05rem !important; }
+}
+/* ===== Starscream Header ===== */
+:root{
+  /* defaults; PHP will override via vars (see snippet below) */
+  --header-bg-color: #eeeeee;
+  --header-text-color: #000000;
+  --accent-color: #0073aa;
+  --header-footer-font: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+  --logo-max-h: 100px; /* use max-height instead of fixed height */
+}
+
+.site-header{
+  background: var(--header-bg-color);
+  color: var(--header-text-color);
+  padding: 10px 20px;
+  font-family: var(--header-footer-font);
+}
+
+.header-topline{
+  text-align: center;
+  font-size: 14px;
+  margin-bottom: 5px;
+}
+
+.header-main{
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.site-logo-link{ display:inline-block; line-height:0; }
+.site-logo-img{
+  max-height: var(--logo-max-h);
+  width: auto;
+  height: auto;
+  display: block;
+}
+
+.header-icons{
+  text-align: right;
+}
+
+.header-icon-link{
+  margin-left: 15px;
+  color: var(--accent-color);
+  text-decoration: none;
+  font-size: 1.1rem;
+}
+
+.header-icon-link:hover{ color: var(--header-text-color); }
+
+.header-contact-line{
+  margin-top: 5px;
+  white-space: nowrap;
+}
+
+.header-contact-icon{
+  color: var(--accent-color);
+  margin-right: 6px;
+}
+
+.header-contact-link{
+  color: var(--header-text-color);
+  text-decoration: none;
+}
+
+/* Mobile: stack logo above icons to avoid squish */
+@media (max-width: 768px){
+  .header-main{ flex-direction: column; gap: 8px; }
+  .header-icons{ text-align: center; }
 }
