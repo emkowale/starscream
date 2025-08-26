@@ -350,3 +350,4 @@ if ( ! function_exists('btx_print_font_css') ) {
 }
 
 require_once get_stylesheet_directory() . '/inc/frontend/site-vars.php';
+require_once get_stylesheet_directory() . '/inc/admin/theme-updater.php';
