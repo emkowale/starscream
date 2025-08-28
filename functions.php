@@ -265,3 +265,5 @@ add_filter('theme_mod_custom_logo', function ($value) {
     $company_logo = (int) get_theme_mod('company_logo_id', 0);
     return $company_logo > 0 ? $company_logo : $value;
 });
+
+require_once get_template_directory() . '/inc/ensure-classic-pages.php';

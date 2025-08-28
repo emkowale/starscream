@@ -10,11 +10,10 @@ if ( function_exists('is_cart') && is_cart() ) {
 } elseif ( function_exists('is_account_page') && is_account_page() ) {
     echo do_shortcode('[woocommerce_my_account]');
 } else {
-    // Fallback: normal page content for any other Woo page you might have
-    while ( have_posts() ) :
-        the_post();
-        the_content();
-    endwhile;
+    // Let WooCommerce render archives + single-product properly
+    if ( function_exists('woocommerce_content') ) {
+        woocommerce_content();
+    }
 }
 
 get_footer();
