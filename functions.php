@@ -1,14 +1,28 @@
-<?php
+<?php 
 /*
  * File: functions.php
- * Path: /wp-content/themes/starscream/functions.php
- * Description: Front page = Shop (no sidebar). Enqueues, Woo image/layout tuning, fonts, and module includes.
- * Theme: Starscream
+ * Description: Bootstrap/theme wiring. Front page → Shop, enqueue, Woo image/grid tweaks. Customizer lives in inc/admin/customizer.php.
+ * Theme: The Bear Traxs Subscription Template (Starscream)
  * Author: Eric Kowalewski
  * Version: 1.4.23
- * Last Updated: 2025-08-26 — 09:45 EDT
+ * Last Updated: 2025-08-28 — 12:58 EDT
  */
 
+// ---------------------------------------------------------
+// Load Customizer (all settings/controls + font helpers/CSS)
+// ---------------------------------------------------------
+$customizer_file = get_template_directory() . '/inc/admin/customizer.php';
+if ( file_exists( $customizer_file ) ) {
+    require_once $customizer_file;
+} else {
+    if ( function_exists('error_log') ) {
+        error_log('[Starscream] Missing inc/admin/customizer.php');
+    }
+}
+
+// ---------------------------------------------------------
+// Front page = Shop renderer (no sidebar, optional hero)
+// ---------------------------------------------------------
 add_action('template_redirect', function () {
     if ( ! function_exists('is_shop') || ! is_shop() || ! is_front_page() ) {
         return;
@@ -111,82 +125,35 @@ add_action('template_redirect', function () {
     exit;
 }, 1);
 
-// Enqueue the theme stylesheet
+// ---------------------------------------------------------
+// Enqueue styles (theme + footer.css)
+// ---------------------------------------------------------
 add_action('wp_enqueue_scripts', function () {
+    // main stylesheet (style.css)
     wp_enqueue_style('beartraxs-style', get_stylesheet_uri(), [], '1.4.23');
+
+    // footer.css (main theme)
+    $footer_path = get_template_directory() . '/assets/css/footer.css';
+    if ( file_exists($footer_path) ) {
+        wp_enqueue_style(
+            'starscream-footer',
+            get_template_directory_uri() . '/assets/css/footer.css',
+            [],
+            filemtime($footer_path)
+        );
+    }
 });
 
-// Woo archive: remove add-to-cart/Select Options button
+// ---------------------------------------------------------
+// Woo archive: remove add-to-cart button (archive tiles only)
+// ---------------------------------------------------------
 add_action('init', function () {
     remove_action('woocommerce_after_shop_loop_item', 'woocommerce_template_loop_add_to_cart', 10);
 }, 20);
 
-/**
- * Fonts: selection helpers + enqueue + runtime CSS
- */
-if ( ! function_exists('btx_get_selected_font_name') ) {
-  function btx_get_selected_font_name() {
-    $font = get_theme_mod('btx_header_footer_font');
-    if (!$font) { $font = get_theme_mod('header_footer_font'); }
-    if (!$font || !is_string($font)) { $font = 'Inter'; }
-    return trim($font);
-  }
-}
-
-if ( ! function_exists('btx_font_stack_for') ) {
-  function btx_font_stack_for( $font ) {
-    $stacks = [
-      'Inter'       => '"Inter", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif',
-      'Roboto'      => '"Roboto", system-ui, -apple-system, "Segoe UI", Arial, sans-serif',
-      'Poppins'     => '"Poppins", system-ui, -apple-system, "Segoe UI", Arial, sans-serif',
-      'Lato'        => '"Lato", system-ui, -apple-system, "Segoe UI", Arial, sans-serif',
-      'Montserrat'  => '"Montserrat", system-ui, -apple-system, "Segoe UI", Arial, sans-serif',
-      'Open Sans'   => '"Open Sans", system-ui, -apple-system, "Segoe UI", Arial, sans-serif',
-    ];
-    return isset($stacks[$font])
-      ? $stacks[$font]
-      : '"' . esc_attr($font) . '", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif';
-  }
-}
-
-if ( ! function_exists('btx_enqueue_selected_font') ) {
-  function btx_enqueue_selected_font() {
-    $font = btx_get_selected_font_name();
-    $google_fonts = ['Inter','Roboto','Poppins','Lato','Montserrat','Open Sans'];
-    if ( in_array($font, $google_fonts, true) ) {
-      $family = str_replace(' ', '+', $font);
-      wp_enqueue_style(
-        'btx-google-font-' . sanitize_title($font),
-        'https://fonts.googleapis.com/css2?family=' . rawurlencode($family) . ':wght@300;400;500;600;700;800;900&display=swap',
-        [],
-        null
-      );
-    }
-  }
-  add_action('wp_enqueue_scripts', 'btx_enqueue_selected_font');
-}
-
-if ( ! function_exists('btx_print_font_css') ) {
-  function btx_print_font_css() {
-    $font       = btx_get_selected_font_name();
-    $font_stack = btx_font_stack_for($font);
-    ?>
-    <style id="btx-site-font-css">
-      :root{ --header-footer-font: <?php echo $font_stack; ?>; }
-      header, .site-header, .main-header, .page-header,
-      nav, .main-navigation, .topbar,
-      footer, .site-footer { font-family: var(--header-footer-font) !important; }
-      /* To apply site-wide, uncomment: */
-      /* html, body, .woocommerce, .woocommerce * { font-family: var(--header-footer-font) !important; } */
-    </style>
-    <?php
-  }
-  add_action('wp_head', 'btx_print_font_css', 99);
-}
-
-/**
- * Woo image settings bootstrapping (once)
- */
+// ---------------------------------------------------------
+// Woo image defaults (apply once) + layout helpers
+// ---------------------------------------------------------
 add_action('after_setup_theme', function () {
     if (get_option('btx_wc_image_defaults_set')) { return; }
 
@@ -199,72 +166,33 @@ add_action('after_setup_theme', function () {
     update_option('btx_wc_image_defaults_set', 1);
 }, 11);
 
-/* Use a larger image size on product archives (no regen needed) */
-add_filter('single_product_archive_thumbnail_size', function ($size) {
-    return 'large';
-}, 99);
-
-// Make the shop grid bigger by using 3 columns instead of Woo's ~4-column default
-add_filter('loop_shop_columns', function ($cols) {
-    return 3;
-}, 99);
-
-// Use a larger image size on the archive tiles (no regeneration required)
-add_filter('single_product_archive_thumbnail_size', function ($size) {
-    return 'large';
-}, 99);
-
-// Hide Add-to-Cart/Select Options on archives (keeps just image → title → price)
-add_action('init', function () {
-    remove_action('woocommerce_after_shop_loop_item', 'woocommerce_template_loop_add_to_cart', 10);
-}, 20);
-
-/* -----------------------------------------------
- * Woo image settings → theme CSS (thumbnail ratio)
- * ----------------------------------------------- */
-if ( ! function_exists('btx_output_woo_image_css') ) {
-  function btx_output_woo_image_css() {
-    $crop = get_option('woocommerce_thumbnail_cropping', '1:1');
+/* Thumbnail aspect ratio CSS variable */
+add_action('wp_head', function () {
+    $crop = get_option('woocommerce_thumbnail_cropping', '1:1'); // '1:1' | 'custom' | 'uncropped'
     $ratio_css = '5 / 7';
     if ($crop === '1:1') {
-      $ratio_css = '1 / 1';
+        $ratio_css = '1 / 1';
     } elseif ($crop === 'custom') {
-      $w = max(1, (int) get_option('woocommerce_thumbnail_cropping_custom_width', 5));
-      $h = max(1, (int) get_option('woocommerce_thumbnail_cropping_custom_height', 7));
-      $ratio_css = $w . ' / ' . $h;
-    } elseif ($crop === 'uncropped') {
-      // aspect-ratio:auto via body class below
+        $w = max(1, (int) get_option('woocommerce_thumbnail_cropping_custom_width', 5));
+        $h = max(1, (int) get_option('woocommerce_thumbnail_cropping_custom_height', 7));
+        $ratio_css = $w . ' / ' . $h;
     }
+    echo '<style id="btx-woo-image-vars">:root{--btx-thumb-aspect:' . esc_html($ratio_css) . ';}</style>';
+}, 99);
 
-    echo '<style id="btx-woo-image-vars">';
-    echo ':root{--btx-thumb-aspect:' . esc_html($ratio_css) . ';}';
-    echo '</style>';
-  }
-  add_action('wp_head', 'btx_output_woo_image_css', 99);
-}
-
-if ( ! function_exists('btx_woo_image_body_class') ) {
-  function btx_woo_image_body_class( $classes ) {
-    $crop = get_option('woocommerce_thumbnail_cropping', '1:1');
-    if ($crop === 'uncropped') {
-      $classes[] = 'btx-uncropped-thumbs';
+add_filter('body_class', function ($classes) {
+    if (get_option('woocommerce_thumbnail_cropping', '1:1') === 'uncropped') {
+        $classes[] = 'btx-uncropped-thumbs';
     }
     return $classes;
-  }
-  add_filter('body_class', 'btx_woo_image_body_class');
-}
+});
 
-/* -------------------------------------------------------------
- * Woo image widths → actual image sizes + front-end layout
- * ------------------------------------------------------------- */
-if ( ! function_exists('btx_output_woo_image_width_css') ) {
-  function btx_output_woo_image_width_css() {
+/* Image width CSS caps */
+add_action('wp_head', function () {
     $single_w = (int) get_option('woocommerce_single_image_width', 600);
     $thumb_w  = (int) get_option('woocommerce_thumbnail_image_width', 300);
-
-    if ($single_w < 200) { $single_w = 200; }
-    if ($thumb_w  < 150) { $thumb_w  = 150; }
-
+    if ($single_w < 200) $single_w = 200;
+    if ($thumb_w  < 150) $thumb_w  = 150;
     ?>
     <style id="btx-woo-image-widths">
       :root{
@@ -283,14 +211,18 @@ if ( ! function_exists('btx_output_woo_image_width_css') ) {
       }
       .woocommerce ul.products li.product .woocommerce-LoopProduct-link img {
         max-width: var(--btx-thumb-img-width) !important;
-        width: 100%; height: auto;
+        width: 100%;
+        height: auto;
       }
     </style>
     <?php
-  }
-  add_action('wp_head', 'btx_output_woo_image_width_css', 100);
-}
+}, 100);
 
+/* Make archive tiles larger; use WordPress 'large' image size */
+add_filter('loop_shop_columns', fn($c) => 3, 99);
+add_filter('single_product_archive_thumbnail_size', fn($s) => 'large', 99);
+
+/* Ensure Woo uses Customizer widths for generated sizes */
 add_filter('woocommerce_get_image_size_single', function($size){
   $w = (int) get_option('woocommerce_single_image_width', 600);
   return ['width' => max(200,$w), 'height' => 0, 'crop' => 0];
@@ -304,50 +236,32 @@ add_filter('woocommerce_get_image_size_thumbnail', function($size){
   return ['width' => max(150,$w), 'height' => $h, 'crop' => $crop];
 }, 10);
 
-add_filter('woocommerce_get_image_size_gallery_thumbnail', function($size){
-  return ['width' => 100, 'height' => 0, 'crop' => 0];
-}, 10);
+add_filter('woocommerce_get_image_size_gallery_thumbnail', fn($s) => ['width'=>100,'height'=>0,'crop'=>0], 10);
 
-/**
- * Modules
- * - Admin/Customizer UI controls/settings → split out
- * - Woo extras (already modular)
- */
-require_once get_stylesheet_directory() . '/inc/admin/customizer.php';
-require_once get_stylesheet_directory() . '/inc/modules/woo-extras.php';
-
-// REPLACE your existing btx_print_font_css() with this:
-if ( ! function_exists('btx_print_font_css') ) {
-  function btx_print_font_css() {
-    // Font
-    $font       = btx_get_selected_font_name();
-    $font_stack = btx_font_stack_for($font);
-
-    // Colors from Customizer
-    $header_bg  = get_theme_mod('header_bg_color', '#eeeeee');
-    $text_col   = get_theme_mod('header_footer_text_color', '#000000');
-    $accent     = get_theme_mod('accent_color', '#0073aa');
-
-    // Logo height (kept as a CSS var so we can change later if needed)
-    $logo_h     = '100px';
-
-    ?>
-    <style id="btx-site-vars">
-      :root{
-        --header-footer-font: <?php echo $font_stack; ?>;
-        --header-bg-color: <?php echo esc_html($header_bg); ?>;
-        --header-text-color: <?php echo esc_html($text_col); ?>;
-        --accent-color: <?php echo esc_html($accent); ?>;
-        --logo-max-h: <?php echo esc_html($logo_h); ?>;
-      }
-      header, .site-header, .main-header, .page-header,
-      nav, .main-navigation, .topbar,
-      footer, .site-footer { font-family: var(--header-footer-font) !important; }
-    </style>
-    <?php
-  }
-  add_action('wp_head', 'btx_print_font_css', 99);
+// ---------------------------------------------------------
+// Woo extras include (child or parent) — non-fatal if missing
+// ---------------------------------------------------------
+$woo_extras = locate_template(['inc/modules/woo-extras.php'], false, false);
+if ( $woo_extras && file_exists( $woo_extras ) ) {
+    require_once $woo_extras;
+} else {
+    if ( function_exists('error_log') ) {
+        error_log('[Starscream] woo-extras.php not found in child or parent; continuing without Woo extras.');
+    }
 }
 
-require_once get_stylesheet_directory() . '/inc/frontend/site-vars.php';
-require_once get_stylesheet_directory() . '/inc/admin/theme-updater.php';
+// Enable core custom logo support (so has_custom_logo() & the_custom_logo() work)
+add_action('after_setup_theme', function () {
+    add_theme_support('custom-logo', [
+        'height'      => 200,
+        'width'       => 600,
+        'flex-width'  => true,
+        'flex-height' => true,
+    ]);
+}, 5);
+
+// If our theme option 'company_logo_id' is set, treat it as the core custom_logo
+add_filter('theme_mod_custom_logo', function ($value) {
+    $company_logo = (int) get_theme_mod('company_logo_id', 0);
+    return $company_logo > 0 ? $company_logo : $value;
+});

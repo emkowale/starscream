@@ -1,0 +1,24 @@
+.footer-copy {
+  text-align: center;
+  font-size: 14px;
+  color: #ccc;
+  line-height: 1.6;
+}
+
+.footer-copy .powered-by {
+  font-size: 12px;
+  color: #aaa;
+  margin-top: 4px;
+  font-style: italic;
+}
+
+.footer-copy .powered-by a {
+  color: #ffd078; /* your Bear Traxs yellow */
+  text-decoration: none;
+  transition: color 0.3s ease, transform 0.2s ease;
+}
+
+.footer-copy .powered-by a:hover {
+  color: #863d3d; /* Bear Traxs brown */
+  transform: scale(1.05);
+}

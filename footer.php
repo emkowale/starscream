@@ -9,9 +9,12 @@
         <img src="<?php echo esc_url($logo_url); ?>" style="height: 100px; width: auto;">
       <?php endif; ?>
     </div>
-    <div class="footer-copy">
-      &copy; <?php echo esc_html(get_bloginfo('name')) . ' ' . date('Y'); ?>. All Rights Reserved.
-    </div>
+      <div class="footer-copy">
+        &copy; <?php echo esc_html(get_bloginfo('name')) . ' ' . date('Y'); ?>. All Rights Reserved.
+        <div class="powered-by">
+          Powered by <a href="https://thebeartraxs.com" target="_blank" rel="noopener">The Bear Traxs</a>
+        </div>
+      </div>
   </div>
   <div style="margin-top: 15px;">
     <?php for ($i = 1; $i <= 4; $i++): ?>
