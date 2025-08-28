@@ -4,7 +4,7 @@
   Author:     Eric Kowalewski
   Author URI: https://thebeartraxs.com
   Description: A lightweight, customizable WooCommerce theme built specifically for The Bear Traxs customers using our custom merch dropshipping subscription plans.
-  Version: 1.4.28
+  Version: 1.4.29
   Requires at least: 6.0
   Tested up to: 6.6
   Requires PHP: 7.4
@@ -12,7 +12,7 @@
 */
 
 /* ====== GLOBAL SPACING (light touch) ====== */
-/*h1,
+h1,
 .woocommerce-result-count,
 .woocommerce-ordering,
 .single-product .product,
@@ -20,7 +20,7 @@
   margin-top: 20px;
   margin-left: 20px;
   margin-right: 20px;
-}*/
+}
 main {
   margin-top: 20px;
   margin-left: 20px;
@@ -34,6 +34,15 @@ main {
     margin-left: 10px;
     margin-right: 10px;
     margin-bottom: 10px;
+  }
+  h1,
+  .woocommerce-result-count,
+  .woocommerce-ordering,
+  .single-product .product,
+  .woocommerce-page .entry-header {
+    margin-top: 10px;
+    margin-left: 10px;
+    margin-right: 10px;
   }
 }
 
@@ -341,10 +350,10 @@ button, input, select, textarea,
 }
 
 /* Coupon button only → 100px width */
-.woocommerce-cart .coupon .button {
+/*.woocommerce-cart .coupon .button {
   width: 100px !important;
   min-width: 100px !important;
-}
+}*/
 
 .woocommerce-cart .wc-proceed-to-checkout a.checkout-button:hover {
   filter: brightness(0.95);
@@ -400,9 +409,14 @@ button, input, select, textarea,
 .woocommerce input.button:disabled { opacity: .6 !important; cursor: not-allowed !important; }
 
 /* 2) CART: Coupon button width & input cosmetics */
-.woocommerce-cart .coupon .button { width: 100px !important; min-width: 100px !important; }
+/*.woocommerce-cart .coupon .button { width: 100px !important; min-width: 100px !important; }
 .woocommerce-cart .coupon .input-text {
   height: 40px; padding: 8px 12px; border-radius: var(--btx-radius); border: 1px solid #ccc;
+}*/
+
+input#coupon_code {
+  float: none;
+  width: 100px;
 }
 
 /* 3 & 5) MY ACCOUNT: left menu as buttons + global font (already applied above) */

@@ -267,3 +267,11 @@ add_filter('theme_mod_custom_logo', function ($value) {
 });
 
 require_once get_template_directory() . '/inc/ensure-classic-pages.php';
+
+
+// Output the Customizer accent color as a CSS variable.
+add_action('wp_head', function () {
+  $accent = get_theme_mod('accent_color', '#0073aa');
+  if (!preg_match('/^#([0-9a-f]{3}){1,2}$/i', $accent)) { $accent = '#0073aa'; }
+  echo '<style id="btx-accent-var">:root{--btx-accent:' . esc_html($accent) . ';}</style>';
+}, 101);
