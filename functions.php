@@ -49,3 +49,5 @@ starscream_require('inc/theme/branding.php');
 /** Optional modules (non-fatal) */
 starscream_require('inc/ensure-classic-pages.php');     // existing
 starscream_require('inc/modules/woo-extras.php');       // optional
+
+starscream_require('inc/admin/theme-updater.php');
