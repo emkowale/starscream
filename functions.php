@@ -275,3 +275,35 @@ add_action('wp_head', function () {
   if (!preg_match('/^#([0-9a-f]{3}){1,2}$/i', $accent)) { $accent = '#0073aa'; }
   echo '<style id="btx-accent-var">:root{--btx-accent:' . esc_html($accent) . ';}</style>';
 }, 101);
+
+
+// ==== Woo Gallery: disable lightbox, keep zoom/slider ====
+add_action('after_setup_theme', function () {
+  // Make sure lightbox is OFF so clicks don’t go fullscreen
+  remove_theme_support('wc-product-gallery-lightbox');
+  // Keep these if you want them (both optional)
+  add_theme_support('wc-product-gallery-zoom');
+  add_theme_support('wc-product-gallery-slider');
+}, 20);
+
+// ==== Enqueue gallery behavior (single product only) ====
+add_action('wp_enqueue_scripts', function () {
+  if (!function_exists('is_product') || !is_product()) return;
+
+  // JS
+  wp_enqueue_script(
+    'starscream-product-gallery',
+    get_stylesheet_directory_uri() . '/assets/js/product-gallery.js',
+    ['jquery'],
+    '1.0.0',
+    true
+  );
+
+  // CSS
+  wp_enqueue_style(
+    'starscream-product-gallery',
+    get_stylesheet_directory_uri() . '/assets/css/product-gallery.css',
+    [],
+    '1.0.0'
+  );
+}, 20);
