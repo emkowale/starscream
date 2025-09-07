@@ -4,7 +4,7 @@
   Author:     Eric Kowalewski
   Author URI: https://thebeartraxs.com
   Description: A lightweight, customizable WooCommerce theme built specifically for The Bear Traxs customers using our custom merch dropshipping subscription plans.
-  Version: 1.4.32
+  Version: 1.4.34
   Requires at least: 6.0
   Tested up to: 6.6
   Requires PHP: 7.4
@@ -59,6 +59,7 @@ main {
   background-position: right 10px center;
   background-size: 12px;
   padding-right: 30px;
+  margin-top: 10px;
 }
 
 /* ====== MISC HIDES (leave Woo defaults alone otherwise) ====== */

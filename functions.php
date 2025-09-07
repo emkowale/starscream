@@ -3,7 +3,6 @@
  * Plugin Name: Starscream Theme Bootstrap
  * Description: Minimal loader that wires modular includes.
  * Author: Eric Kowalewski
- * Version: 1.4.29
  * Last Updated: 2025-09-02 21:35 EDT
  */
 
@@ -51,3 +50,4 @@ starscream_require('inc/ensure-classic-pages.php');     // existing
 starscream_require('inc/modules/woo-extras.php');       // optional
 
 starscream_require('inc/admin/theme-updater.php');
+starscream_require('inc/frontpage/banners.php');
