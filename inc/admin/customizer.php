@@ -5,6 +5,44 @@
  */
 if (!defined('ABSPATH')) exit;
 
+/** Ensure a single section id constant for all submodules */
+if (!defined('STARSCREAM_CUSTOMIZER_SECTION')) {
+  define('STARSCREAM_CUSTOMIZER_SECTION', 'beartraxs_colors');
+}
+
+/** Create the section early */
+add_action('customize_register', function($wp_customize){
+  if (!$wp_customize->get_section(STARSCREAM_CUSTOMIZER_SECTION)) {
+    $wp_customize->add_section(STARSCREAM_CUSTOMIZER_SECTION, [
+      'title'    => 'Starscream Options',
+      'priority' => 30,
+    ]);
+  }
+}, 1);
+
+/** child-first require helper */
+if (!function_exists('starscream_customizer_require')) {
+  function starscream_customizer_require($rel){
+    if (function_exists('starscream_locate')) {
+      $p = starscream_locate($rel);
+      if ($p && file_exists($p)) { require_once $p; return; }
+    }
+    $fallback = get_template_directory() . '/' . ltrim($rel,'/');
+    if (file_exists($fallback)) require_once $fallback;
+  }
+}
+
+/** Load submodules */
+foreach ([
+  'inc/admin/customizer/helpers.php',
+  'inc/admin/customizer/logo.php',
+  'inc/admin/customizer/colors.php',
+  'inc/admin/customizer/fonts.php',
+  'inc/admin/customizer/contact_hero.php',
+  'inc/admin/customizer/banners.php',
+  'inc/admin/customizer/socials.php',
+] as $rel) { starscream_customizer_require($rel); }
+
 /** Create the section early so subfiles can attach controls to it */
 add_action('customize_register', function($wp_customize){
   if (!isset($wp_customize)) return;
