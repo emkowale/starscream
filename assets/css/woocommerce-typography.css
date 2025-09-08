@@ -1,0 +1,29 @@
+/* Global font variables and Woo typography */
+:root{ --btx-site-font: var(--header-footer-font, Inter, system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif); }
+
+html, body,
+h1,h2,h3,h4,h5,h6,
+.site-title,.site-description,
+nav,.menu,.sub-menu,
+.widget,.entry-title,.entry-content,.entry-meta,
+button,input,select,textarea,
+.woocommerce,.woocommerce-page,
+.woocommerce *:not(i[class*="fa"], .dashicons, .tinvwl_add_to_wishlist_button:before){
+  font-family:var(--btx-site-font) !important;
+}
+
+/* Single product: force font on critical bits */
+.single-product .site-main,
+.single-product div.product,
+.single-product div.product *:not(i[class*="fa"], .dashicons, .dashicons-before::before){ font-family:var(--header-footer-font, "Oswald", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif) !important; }
+
+.single-product h1.product_title,
+.single-product .price,
+.single-product .woocommerce-Price-amount,
+.single-product .woocommerce-variation-price,
+.single-product .woocommerce-tabs,
+.single-product .entry-summary,
+.single-product form.cart label,
+.single-product .variations label{
+  font-family:var(--header-footer-font, "Oswald", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif) !important;
+}

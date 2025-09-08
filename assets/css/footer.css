@@ -1,81 +1,52 @@
-.footer-copy {
-  text-align: center;
-  font-size: 14px;
-  line-height: 1.6;
+/* Footer uses CSS vars from vars.php */
+.btx-site-footer,
+.bt-footer,
+footer.site-footer{
+  background: var(--footer-bg-color);
+  color:      var(--footer-text-color);
+  font-family: var(--header-footer-font);
+  padding: 24px 20px;
 }
 
-.footer-copy .powered-by {
-  font-size: 12px;
-  margin-top: 4px;
-  font-style: italic;
-}
-
-.footer-copy .powered-by a {
-  text-decoration: none;
-  transition: color 0.3s ease, transform 0.2s ease;
-}
-
-.footer-copy .powered-by a:hover {
-  color: #863d3d; /* Bear Traxs brown */
-  transform: scale(1.05);
-}
-
-/* Starscream – Footer */
-.bt-footer{
-  background: var(--bt-footer-bg);
-  color: var(--bt-footer-text);
-  font-family: var(--bt-font, Roboto), system-ui, -apple-system, Segoe UI, Arial, sans-serif;
-  padding: 20px;
-}
-.bt-footer a{ color: inherit; text-decoration: none; }
-.bt-footer a:hover{ text-decoration: underline; }
-
+/* Grid layout */
 .bt-footer-grid{
-  display: flex;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
   align-items: center;
-  justify-content: space-between;
-  gap: 24px;
-  text-align: center;
+}
+@media (max-width: 768px){
+  .bt-footer-grid{
+    grid-template-columns: 1fr;
+    text-align: center;
+    gap: 12px;
+  }
 }
 
-/* Equal columns */
-.bt-footer-col{ flex: 1; }
+/* Links default to footer text color; accent on hover */
+.btx-site-footer a,
+.bt-footer a,
+footer.site-footer a{
+  color: var(--footer-text-color);
+  text-decoration: none;
+}
+.btx-site-footer a:hover,
+.bt-footer a:hover,
+footer.site-footer a:hover{
+  color: var(--accent-color);
+}
 
 /* Logo */
 .bt-footer-logo img{
-  height: 100px;
+  height: 56px;
   width: auto;
-  max-width: 100%;
+  display: inline-block;
 }
 
 /* Copy */
-.bt-footer-copy .powered-by{
-  font-size: .9em;
-  margin-top: 6px;
+.bt-footer-copy{
+  text-align: center;
+  font-size: 0.95rem;
+  opacity: 0.95;
 }
-.bt-footer-copy .powered-by a{
-  color: var(--bt-accent);
-}
-
-/* Socials */
-.bt-footer-socials a{
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  margin: 0 10px;
-}
-.bt-footer-socials i{
-  font-size: 24px;
-  line-height: 1;
-  color: var(--bt-accent);
-}
-
-/* Mobile stacking */
-@media (max-width: 768px){
-  .bt-footer-grid{
-    flex-direction: column;
-    text-align: center;
-  }
-  .bt-footer-col{ width: 100%; }
-  .bt-footer-logo img{ height: 80px; }
-}
+.bt-footer-copy .powered-by{ margin-top: 6px;

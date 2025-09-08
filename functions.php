@@ -32,6 +32,9 @@ starscream_require('inc/admin/customizer.php');  // existing file
 starscream_require('inc/frontpage/hero.php');
 starscream_require('inc/frontpage/shop-override.php');
 
+// Front page banners (render header/footer banners)
+starscream_require('inc/frontpage/banners.php');
+
 /** Enqueues & CSS vars */
 starscream_require('inc/enqueue/styles.php');
 starscream_require('inc/enqueue/gallery.php');
@@ -50,4 +53,11 @@ starscream_require('inc/ensure-classic-pages.php');     // existing
 starscream_require('inc/modules/woo-extras.php');       // optional
 
 starscream_require('inc/admin/theme-updater.php');
-starscream_require('inc/frontpage/banners.php');
+
+// DEBUG (remove after test)
+add_action('wp_head', function () {
+  echo "\n<!-- starscream: functions.php LOADED -->\n";
+  echo function_exists('btx_render_banner')
+    ? "<!-- starscream: banners AVAILABLE -->\n"
+    : "<!-- starscream: banners MISSING -->\n";
+}, 0);

@@ -1,0 +1,49 @@
+/* Site header styles controlled via CSS variables */
+.btx-site-header{
+  background-color: var(--header-bg-color);
+  color:            var(--header-text-color);
+  padding: 10px 20px;
+  font-family: var(--header-footer-font);
+}
+
+/* Links inside header default to header text color */
+.btx-site-header a{ color: var(--header-text-color); text-decoration: none; }
+
+/* Icon links (Account/Cart) use accent; hover uses footer text color for contrast */
+.header-icons a[aria-label]{ color: var(--accent-color); }
+.header-icons a[aria-label]:hover{ color: var(--footer-text-color); }
+
+/* The small phone/mail icons use accent */
+.header-icons i{ color: var(--accent-color); }
+
+/* Keep layout tweaks already inline on container (OK since tiny) */
+
+/* Layout */
+.btx-header-bar{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+.btx-tagline{
+  text-align:center;
+  font-size:14px;
+  margin-bottom:5px;
+}
+
+/* Colors/links driven by vars from vars.php */
+.btx-site-header{
+  background-color: var(--header-bg-color);
+  color:            var(--header-text-color);
+  padding: 10px 20px;
+  font-family: var(--header-footer-font);
+}
+.btx-site-header a{ color: var(--header-text-color); text-decoration:none; }
+
+/* Icon links use accent; hover uses footer text color for contrast */
+.header-icons a[aria-label]{ color: var(--accent-color); }
+.header-icons a[aria-label]:hover{ color: var(--footer-text-color); }
+
+/* Phone/Email block spacing + colors */
+.header-icons > div{ margin-top:5px; }
+.header-icons i{ color: var(--accent-color); }
+.header-icons > div a{ color: var(--header-text-color); }
