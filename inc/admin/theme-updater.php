@@ -15,10 +15,18 @@ class Starscream_Theme_Updater {
   }
 
   static function boot(){
+    // Inject whether WP is writing OR reading the update_themes transient
     add_filter('pre_set_site_transient_update_themes',[__CLASS__,'inject'],10,1);
+    add_filter('site_transient_update_themes',[__CLASS__,'inject'],10,1);
+
+    // Theme details modal
     add_filter('themes_api',[__CLASS__,'details'],10,3);
-    add_filter('upgrader_source_selection',[__CLASS__,'rename'],10,4);
+
+    // Ensure cache busts on Updates page AND Themes page
     add_action('load-update-core.php',[__CLASS__,'bust']);
+    add_action('load-themes.php',[__CLASS__,'bust']);
+
+    // Also bust after any theme upgrade completes
     add_action('upgrader_process_complete',[__CLASS__,'bust_after'],10,2);
   }
 
@@ -29,20 +37,19 @@ class Starscream_Theme_Updater {
     return ['headers'=>['User-Agent'=>'WP-Starscream-Updater'],'timeout'=>12];
   }
 
-  /** Fallback: read Version from raw style.css in main and build codeload ZIP */
+  /** Fallback: read Version from raw style.css in main, codeload ZIP */
   protected static function from_raw(){
     $r = wp_remote_get(self::RAW_STYLE, self::ua());
     if (is_wp_error($r) || wp_remote_retrieve_response_code($r)!==200) return null;
     $css = wp_remote_retrieve_body($r);
     if (!preg_match('/^\s*Version:\s*([0-9][0-9a-zA-Z\.\-\+_]*)/mi', $css, $m)) return null;
-    $ver = trim($m[1]);
-    $tag = 'v'.$ver;
+    $ver = trim($m[1]); $tag = 'v'.$ver;
     $zip = "https://codeload.github.com/".self::OWNER."/".self::REPO."/zip/refs/tags/".$tag;
     $url = "https://github.com/".self::OWNER."/".self::REPO."/releases/tag/".$tag;
     return ['version'=>$ver,'zip'=>$zip,'url'=>$url];
   }
 
-  /** Prefer: latest GitHub Release; use asset .zip if present, else codeload ZIP */
+  /** Prefer: latest GitHub Release; asset .zip if present, else codeload ZIP */
   protected static function from_github(){
     $r = wp_remote_get("https://api.github.com/repos/".self::OWNER."/".self::REPO."/releases/latest", self::ua());
     if (is_wp_error($r) || wp_remote_retrieve_response_code($r)!==200) return null;
@@ -67,14 +74,13 @@ class Starscream_Theme_Updater {
 
   protected static function latest(){
     if ($c = get_site_transient(self::CACHE)) return $c;
-    // Prefer a Release; fall back to raw
     $d = self::from_github();
     if (!$d) $d = self::from_raw();
     if ($d) set_site_transient(self::CACHE, $d, self::TTL);
     return $d;
   }
 
-  /** Inject update info into WP's theme update transient */
+  /** Inject update info into WP's theme update object */
   static function inject($tr){
     $slug  = self::slug();
     $theme = wp_get_theme($slug);
@@ -113,18 +119,6 @@ class Starscream_Theme_Updater {
       'download_link' => $d['zip'],
       'sections'      => ['description' => 'Updates served from GitHub releases/tags (public).']
     ];
-  }
-
-  /** Rename extracted folder (e.g., starscream-1.4.37) -> real theme slug */
-  static function rename($src, $remote, $upgrader, $extra){
-    $slug = self::slug();
-    $is = (isset($extra['theme']) && $extra['theme'] === $slug)
-       || (isset($extra['themes']) && in_array($slug, (array)$extra['themes'], true));
-    if (!$is) return $src;
-    if (basename($src) === $slug) return $src;
-
-    $dest = trailingslashit(dirname($src)).$slug;
-    return @rename($src, $dest) ? $dest : $src;
   }
 }
 Starscream_Theme_Updater::boot();
