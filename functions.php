@@ -29,8 +29,8 @@ starscream_require('inc/lib/assets.php');        // asset URI helper
 starscream_require('inc/admin/customizer.php');  // existing file
 
 /** Front page → Shop (hero split) */
-starscream_require('inc/frontpage/hero.php');
-starscream_require('inc/frontpage/shop-override.php');
+starscream_require('inc/frontend/hero.php');
+starscream_require('inc/frontend/shop-override.php');
 
 // Front page banners (render header/footer banners)
 starscream_require('inc/frontpage/banners.php');
