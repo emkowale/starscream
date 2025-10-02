@@ -73,3 +73,6 @@ starscream_require('inc/woo/variations-lite.php');
 
 // Add-only: quiet product gallery (no lightbox, keep hover zoom, disable click)
 starscream_require('inc/woo/gallery-quiet.php');
+
+// Add-only: auto-create & assign "Main Menu" to primary
+starscream_require('inc/theme/auto-main-menu.php');
