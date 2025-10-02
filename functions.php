@@ -53,3 +53,23 @@ starscream_require('inc/modules/woo-extras.php');
 
 /** Updater (GitHub “latest” + codeload fallback; dynamic slug) */
 starscream_require('inc/admin/theme-updater.php');
+
+// Add-only: nav formatting & toggle (no color changes)
+starscream_require('inc/enqueue/nav-lite.php');
+
+// Add-only: menu locations
+starscream_require('inc/theme/menus-lite.php');
+
+// Add-only: inject hidden nav so JS can place it if header lacks one
+starscream_require('inc/inject/nav-output.php');
+
+starscream_require('inc/enqueue/nav-tabs.php');
+
+// Add-only: nav layout (menu under logo on desktop; full-screen overlay mobile)
+starscream_require('inc/enqueue/nav-layout.php');
+
+// Add-only: Woo variations (auto-select + hide single-choice/internal attrs)
+starscream_require('inc/woo/variations-lite.php');
+
+// Add-only: quiet product gallery (no lightbox, keep hover zoom, disable click)
+starscream_require('inc/woo/gallery-quiet.php');
