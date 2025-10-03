@@ -65,7 +65,7 @@ else
 fi
 echo "✔ Updated CHANGELOG.md"
 
-# --- Commit everything (safe, includes new/deleted files) ---
+# --- Commit everything ---
 git add -A
 git commit -m "chore(release): v${NEWVER}" || echo "ℹ Nothing to commit"
 git push
@@ -74,14 +74,21 @@ git push
 git tag -a "v${NEWVER}" -m "${PROJECT} v${NEWVER}"
 git push origin "v${NEWVER}"
 
-# --- Build Clean ZIP ---
+# --- Build Clean ZIP (correct WP structure) ---
 cd ..
-rsync -a "$PROJECT" "${PROJECT}-v${NEWVER}" \
-  --exclude ".git" --exclude ".github" --exclude "node_modules" \
-  --exclude "vendor" --exclude "*.map" --exclude "*.DS_Store"
+WORKDIR="${PROJECT}-build"
+rm -rf "$WORKDIR"
+mkdir "$WORKDIR"
 
-zip -r "$ZIPNAME" "${PROJECT}-v${NEWVER}"
-rm -rf "${PROJECT}-v${NEWVER}"
+rsync -a "$PROJECT/" "$WORKDIR/$PROJECT/" \
+  --exclude ".git" --exclude ".github" --exclude "node_modules" \
+  --exclude "vendor" --exclude "*.map" --exclude "*.DS_Store" \
+  --exclude "release.sh"
+
+cd "$WORKDIR"
+zip -r "../$ZIPNAME" "$PROJECT"
+cd ..
+rm -rf "$WORKDIR"
 cd "$PROJECT"
 
 # --- GitHub Release ---
