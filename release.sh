@@ -12,69 +12,94 @@ fi
 BUMP=$1
 PROJECT=$(basename "$PWD")
 
-# --- Get current version ---
-if [ -f "style.css" ]; then
-  CURVER=$(grep -i "Version:" style.css | head -n1 | sed -E 's/.*Version:[[:space:]]*//')
-elif [ -f "${PROJECT}.php" ]; then
-  CURVER=$(grep -i "Version:" "${PROJECT}.php" | head -n1 | sed -E 's/.*Version:[[:space:]]*//')
-else
-  echo "❌ No version source found (style.css or ${PROJECT}.php)"
-  exit 1
-fi
+# ---------- helpers ----------
+read_file_version() {
+  if [ -f "style.css" ]; then
+    grep -i "Version:" style.css | head -n1 | sed -E 's/.*Version:[[:space:]]*//'
+  elif [ -f "${PROJECT}.php" ]; then
+    grep -i "Version:" "${PROJECT}.php" | head -n1 | sed -E 's/.*Version:[[:space:]]*//'
+  else
+    echo "0.0.0"
+  fi
+}
 
-IFS='.' read -r MAJOR MINOR PATCH <<< "$CURVER"
+ver_max() {
+  # prints the greater of two semver strings (no 'v' prefix)
+  printf "%s\n%s\n" "$1" "$2" | sort -V | tail -n1
+}
+
+tag_exists() {
+  git rev-parse -q --verify "refs/tags/$1" >/dev/null 2>&1
+}
+
+# ---------- determine base version ----------
+LATEST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "v0.0.0")
+TAGVER="${LATEST_TAG#v}"
+FILEVER="$(read_file_version)"
+BASEVER="$(ver_max "$FILEVER" "$TAGVER")"
+
+IFS='.' read -r MAJOR MINOR PATCH <<< "$BASEVER"
 
 case $BUMP in
-  major)
-    MAJOR=$((MAJOR+1)); MINOR=0; PATCH=0 ;;
-  minor)
-    MINOR=$((MINOR+1)); PATCH=0 ;;
-  patch)
-    PATCH=$((PATCH+1)) ;;
-  *)
-    echo "❌ Invalid bump type. Use: major, minor, patch"
-    exit 1 ;;
+  major) MAJOR=$((MAJOR+1)); MINOR=0; PATCH=0 ;;
+  minor) MINOR=$((MINOR+1)); PATCH=0 ;;
+  patch) PATCH=$((PATCH+1)) ;;
+  *) echo "❌ Invalid bump type. Use: major, minor, patch"; exit 1 ;;
 esac
 
 NEWVER="${MAJOR}.${MINOR}.${PATCH}"
+# if tag already exists, bump patch until free
+while tag_exists "v${NEWVER}"; do
+  PATCH=$((PATCH+1))
+  NEWVER="${MAJOR}.${MINOR}.${PATCH}"
+done
+
 ZIPNAME="${PROJECT}-v${NEWVER}.zip"
+echo "🚀 Bumping $PROJECT $BASEVER → $NEWVER"
 
-echo "🚀 Bumping $PROJECT $CURVER → $NEWVER"
-
-# --- Update version (SSHFS-safe) ---
+# ---------- update versions (SSHFS-safe) ----------
 if [ -f "style.css" ]; then
   sed -E 's/^Version:.*/Version: '"${NEWVER}"'/' style.css > style.css.tmp && mv style.css.tmp style.css
   echo "✔ Updated style.css"
 fi
 
 if [ -f "${PROJECT}.php" ]; then
-  sed -E 's/(\* Version:).*/\1 '"${NEWVER}"'/' "${PROJECT}.php" > tmpfile && mv tmpfile "${PROJECT}.php"
+  sed -E 's/^(\s*\*\s*Version:).*/\1 '"${NEWVER}"'/' "${PROJECT}.php" > tmpfile && mv tmpfile "${PROJECT}.php"
   echo "✔ Updated ${PROJECT}.php"
 fi
 
-# --- Update CHANGELOG.md ---
-if [ -f CHANGELOG.md ]; then
-  echo "## v${NEWVER} - $(date +%Y-%m-%d)" > .changelog.tmp
-  git log $(git describe --tags --abbrev=0)..HEAD --pretty=format:"- %s" >> .changelog.tmp || true
-  echo -e "\n\n$(cat CHANGELOG.md)" >> .changelog.tmp
-  mv .changelog.tmp CHANGELOG.md
+# ---------- update CHANGELOG.md ----------
+PREV_TAG="$LATEST_TAG"
+if git rev-parse -q --verify "$PREV_TAG" >/dev/null 2>&1 && [ "$PREV_TAG" != "v0.0.0" ]; then
+  LOG_RANGE="${PREV_TAG}..HEAD"
 else
-  echo "# Changelog" > CHANGELOG.md
-  echo "## v${NEWVER} - $(date +%Y-%m-%d)" >> CHANGELOG.md
-  git log --pretty=format:"- %s" >> CHANGELOG.md
+  LOG_RANGE=""
 fi
+
+{
+  echo "## v${NEWVER} - $(date +%Y-%m-%d)"
+  if [ -n "$LOG_RANGE" ]; then
+    git log $LOG_RANGE --pretty=format:"- %s" || true
+  else
+    git log --pretty=format:"- %s" || true
+  fi
+  echo
+  echo
+  [ -f CHANGELOG.md ] && cat CHANGELOG.md
+} > .changelog.tmp
+mv .changelog.tmp CHANGELOG.md
 echo "✔ Updated CHANGELOG.md"
 
-# --- Commit everything ---
+# ---------- commit & push ----------
 git add -A
 git commit -m "chore(release): v${NEWVER}" || echo "ℹ Nothing to commit"
 git push
 
-# --- Tag + push tag ---
+# ---------- tag & push tag ----------
 git tag -a "v${NEWVER}" -m "${PROJECT} v${NEWVER}"
 git push origin "v${NEWVER}"
 
-# --- Build Clean ZIP (correct WP structure) ---
+# ---------- build clean ZIP with correct WP structure ----------
 cd ..
 WORKDIR="${PROJECT}-build"
 rm -rf "$WORKDIR"
@@ -86,14 +111,20 @@ rsync -a "$PROJECT/" "$WORKDIR/$PROJECT/" \
   --exclude "release.sh"
 
 cd "$WORKDIR"
-zip -r "../$ZIPNAME" "$PROJECT"
+zip -r "../$ZIPNAME" "$PROJECT" >/dev/null
 cd ..
 rm -rf "$WORKDIR"
 cd "$PROJECT"
 
-# --- GitHub Release ---
-gh release create "v${NEWVER}" "../$ZIPNAME" \
-  --title "${PROJECT} v${NEWVER}" \
-  --notes-file CHANGELOG.md
+# ---------- GitHub release ----------
+if command -v gh >/dev/null 2>&1; then
+  gh release create "v${NEWVER}" "../$ZIPNAME" \
+    --title "${PROJECT} v${NEWVER}" \
+    --notes-file CHANGELOG.md
+  echo "✔ Published GitHub release v${NEWVER}"
+else
+  echo "⚠ 'gh' not found; created tag and zip, but did not publish a GitHub release."
+  echo "   You can run: gh release create v${NEWVER} ../${ZIPNAME} --title \"${PROJECT} v${NEWVER}\" --notes-file CHANGELOG.md"
+fi
 
 echo "🎉 Release $PROJECT v$NEWVER complete"
