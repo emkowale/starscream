@@ -1,3 +1,4 @@
+<?php
 /*
  * File: inc/vector-uploads.php
  * Description: Enables upload of vector graphics formats (EPS, AI, SVG, etc.)
