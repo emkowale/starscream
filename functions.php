@@ -79,3 +79,8 @@ starscream_require('inc/theme/auto-main-menu.php');
 
 // Enable vector uploads (EPS, AI, SVG, etc.)
 starscream_require('inc/vector-uploads.php');
+
+// Hide the quality attribute)
+starscream_require('inc/hide-quality-attribute.php');
+
+
