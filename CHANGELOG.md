@@ -1,3 +1,7 @@
+## v1.4.49 - 2025-10-22
+
+- Initial import for Starscream theme
+
 ## v1.4.48 - 2025-10-22
 
 ### Other
