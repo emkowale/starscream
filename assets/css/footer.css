@@ -131,3 +131,12 @@ footer.site-footer a:hover{
 ul.products + nav.woocommerce-pagination {
   display: none !important;
 }
+
+.bt-footer-col.bt-footer-socials.footer-socials {
+  text-align: center;
+}
+
+.fa-brands, .fab {
+  font-weight: 400;
+  padding: 6px;
+}
