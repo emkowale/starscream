@@ -1,0 +1,48 @@
+/* Homepage header/footer banners */
+.btx-header-banner,
+.btx-footer-banner{
+  width:100vw;
+  margin-left:calc(50% - 50vw);
+  margin-right:calc(50% - 50vw);
+  overflow:hidden;
+}
+.btx-header-banner{ margin-bottom:24px; }
+.btx-footer-banner{ margin-top:24px; }
+
+.btx-header-banner__link,
+.btx-footer-banner__link{ display:block; width:100%; height:auto; }
+
+/* Base image behavior */
+img.btx-header-banner__img,
+img.btx-footer-banner__img{
+  display:block;
+  width:100%;
+  height:auto;
+  object-position:center center;
+}
+
+/* Crop sides on medium screens */
+@media (max-width:1024px){
+  img.btx-header-banner__img,
+  img.btx-footer-banner__img{
+    height:240px !important;
+    object-fit:cover !important;
+    object-position:50% 50% !important;
+  }
+}
+
+/* Phones portrait */
+@media (max-width:600px){
+  img.btx-header-banner__img,
+  img.btx-footer-banner__img{
+    height:180px !important;
+  }
+}
+
+/* Phones landscape */
+@media (max-width:600px) and (orientation:landscape){
+  img.btx-header-banner__img,
+  img.btx-footer-banner__img{
+    height:40vh !important;
+  }
+}

@@ -1,0 +1,63 @@
+/* Primary nav: tab layout, neutral colors (inherit theme palette) */
+
+/* Strengthen layout */
+.site-nav { flex: 1; }
+.site-nav .menu{
+  display:flex; align-items:center; justify-content:center; gap:28px;
+  white-space:nowrap; margin:0; padding:0; list-style:none;
+  font-weight:800; text-transform:uppercase; letter-spacing:.03em;
+  font-size:clamp(14px,.92rem + .2vw,16px);
+}
+
+/* Tab shape */
+.site-nav .menu > li { position:relative }
+.site-nav .menu > li > a{
+  display:block; line-height:1; padding:14px 18px;
+  text-decoration:none; color:currentColor; border-radius:8px;
+  transition:background .18s ease, transform .18s ease;
+}
+
+/* Hover/active: keep color, use neutral surface */
+.site-nav .menu > li:hover > a,
+.site-nav .menu > li.focus > a{
+  background:var(--btx-surface-2, rgba(0,0,0,.06));
+}
+.site-nav .menu > li.current-menu-item > a,
+.site-nav .menu > li.current-menu-ancestor > a{
+  background:var(--btx-surface-2, rgba(0,0,0,.08));
+}
+
+/* Dropdown (clean, neutral) */
+.site-nav .menu .sub-menu{
+  position:absolute; left:0; top:100%; min-width:220px;
+  background:var(--btx-surface, #fff); color:inherit;
+  border-radius:10px; box-shadow:0 10px 30px rgba(0,0,0,.12);
+  padding:10px 0; display:none; z-index:50;
+}
+.site-nav .menu li:hover > .sub-menu{ display:block }
+.site-nav .menu .sub-menu a{
+  display:block; padding:10px 14px; text-decoration:none; color:inherit;
+}
+.site-nav .menu .sub-menu a:hover{
+  background:var(--btx-surface-2, #f3f5f7);
+}
+
+/* Accessibility */
+.site-nav .menu > li > a:focus-visible{
+  outline:2px solid var(--accent-color, currentColor); outline-offset:2px;
+}
+
+/* Mobile: keep the same look but stacked */
+@media (max-width:980px){
+  .site-nav .menu{
+    position:absolute; left:0; right:0; top:calc(100% + 8px);
+    flex-direction:column; align-items:flex-start; gap:0;
+    background:var(--btx-surface, #fff);
+    border-radius:12px; box-shadow:0 12px 30px rgba(0,0,0,.12);
+    padding:8px; display:none;
+  }
+  .site-nav.open .menu{ display:flex }
+  .site-nav .menu > li{ width:calc(100% - 20px) }
+  .site-nav .menu > li > a{ width:calc(100% - 20px); padding:12px 10px; border-radius:8px }
+  .site-nav .menu .sub-menu{ position:static; box-shadow:none; border-radius:8px; padding:6px 0; display:block }
+}

@@ -1,0 +1,17 @@
+/* Keep Woo zoom on hover; no full-screen lightbox */
+.woocommerce-product-gallery__image img{
+  transition: transform .25s ease;
+  transform-origin: center center;
+}
+
+/* Subtle zoom on hover (works with Woo zoom too) */
+.woocommerce-product-gallery__image:hover img{
+  transform: scale(1.06);
+}
+
+/* Cursor should not suggest a click-through */
+.woocommerce-product-gallery__image a{
+  cursor: default;
+  text-decoration: none;
+  pointer-events: none; /* ensure click does nothing even if JS is blocked */
+}

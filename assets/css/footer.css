@@ -1,0 +1,133 @@
+/* Footer uses CSS vars from vars.php */
+.btx-site-footer,
+.bt-footer,
+footer.site-footer{
+  background: var(--footer-bg-color);
+  color:      var(--footer-text-color);
+  font-family: var(--header-footer-font);
+  padding: 24px 20px;
+}
+
+/* Grid layout */
+.bt-footer-grid{
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  align-items: center;
+}
+@media (max-width: 768px){
+  .bt-footer-grid{
+    grid-template-columns: 1fr;
+    text-align: center;
+    gap: 12px;
+  }
+}
+
+/* Links default to footer text color; accent on hover */
+.btx-site-footer a,
+.bt-footer a,
+footer.site-footer a{
+  color: var(--footer-text-color);
+  text-decoration: none;
+}
+.btx-site-footer a:hover,
+.bt-footer a:hover,
+footer.site-footer a:hover{
+  color: var(--accent-color);
+}
+
+/* Logo */
+.bt-footer-logo img{
+  height: 56px;
+  width: auto;
+  display: inline-block;
+}
+
+/* Copy */
+.bt-footer-copy{
+  text-align: center;
+  font-size: 0.95rem;
+  opacity: 0.95;
+}
+.bt-footer-copy .powered-by{ margin-top: 6px;}
+
+/* pagination */
+.woocommerce nav.woocommerce-pagination,
+.pagination,
+.nav-links {
+  margin: 2rem auto;
+  text-align: center;
+}
+
+.woocommerce nav.woocommerce-pagination ul,
+.pagination ul,
+.nav-links {
+  display: inline-flex;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  border: 1px solid #000000;
+  border-radius: 6px;
+  overflow: hidden;
+  box-shadow: 0 2px 4px rgba(0,0,0,.08);
+}
+
+.woocommerce nav.woocommerce-pagination ul li,
+.pagination ul li,
+.nav-links li {
+  margin: 0;
+  border-right: 1px solid #000000;
+}
+
+.woocommerce nav.woocommerce-pagination ul li:last-child,
+.pagination ul li:last-child,
+.nav-links li:last-child {
+  border-right: none;
+}
+
+.woocommerce nav.woocommerce-pagination ul li a,
+.woocommerce nav.woocommerce-pagination ul li span,
+.pagination a,
+.pagination span,
+.nav-links a,
+.nav-links span {
+  display: block;
+  padding: 0.65rem 1.2rem;
+  background: var(--btx-bg);
+  color: var(--btx-text);
+  font-weight: 500;
+  text-decoration: none;
+  transition: background .2s ease, color .2s ease;
+}
+
+/* hover */
+.woocommerce nav.woocommerce-pagination ul li a:hover,
+.pagination a:hover,
+.nav-links a:hover {
+  background: #f5f7f9;
+  color: var(--accent-color);
+}
+
+/* current page */
+.woocommerce nav.woocommerce-pagination ul li span.current,
+.pagination span.current,
+.nav-links span.current {
+  background: var(--accent-color);
+  color: #fff;
+  font-weight: 600;
+}
+
+/* dots */
+.woocommerce nav.woocommerce-pagination ul li span.dots,
+.pagination span.dots,
+.nav-links span.dots {
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  color: var(--btx-text);
+}
+
+/* Hide the legacy blue paginator that comes right after the products grid */
+ul.products + nav.woocommerce-pagination {
+  display: none !important;
+}
