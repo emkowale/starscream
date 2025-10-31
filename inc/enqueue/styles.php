@@ -29,4 +29,5 @@ add_action('wp_enqueue_scripts', function () {
   wp_enqueue_style('starscream-header',  starscream_asset_uri('assets/css/header.css'), ['starscream-base'], wp_get_theme()->get('Version'));
   wp_enqueue_style('starscream-footer', starscream_asset_uri('assets/css/footer.css'), ['starscream-header'], wp_get_theme()->get('Version'));
   wp_enqueue_style('starscream-banners', starscream_asset_uri('assets/css/banners.css'), [], $v);
+  wp_enqueue_style('starscream-cart', starscream_asset_uri('assets/css/cart.css'), [], $v);
 }, 50);
