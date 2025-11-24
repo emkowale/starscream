@@ -42,6 +42,7 @@ starscream_require('inc/enqueue/vars.php');
 /** WooCommerce tweaks */
 starscream_require('inc/woo/archive-tweaks.php');
 starscream_require('inc/woo/image-sizes.php');
+starscream_require('inc/woo/homepage-shop.php');
 
 /** Theme supports & branding */
 starscream_require('inc/theme/supports.php');
@@ -50,6 +51,7 @@ starscream_require('inc/theme/branding.php');
 /** Optional modules (non-fatal) */
 starscream_require('inc/ensure-classic-pages.php');
 starscream_require('inc/modules/woo-extras.php');
+starscream_require('inc/woo/store-setup.php');
 
 /** Updater (GitHub “latest” + codeload fallback; dynamic slug) */
 starscream_require('inc/admin/theme-updater.php');
@@ -74,6 +76,9 @@ starscream_require('inc/woo/variations-lite.php');
 // Add-only: quiet product gallery (no lightbox, keep hover zoom, disable click)
 starscream_require('inc/woo/gallery-quiet.php');
 
+// Brand the WP login screen with Starscream colors/logo
+starscream_require('inc/login/style.php');
+
 // Add-only: auto-create & assign "Main Menu" to primary
 starscream_require('inc/theme/auto-main-menu.php');
 
@@ -83,4 +88,8 @@ starscream_require('inc/vector-uploads.php');
 // Hide the quality attribute)
 starscream_require('inc/hide-quality-attribute.php');
 
+// Disable all WooCommerce customer-facing emails
+starscream_require('inc/woo/disable-customer-emails.php');
 
+// Force site timezone to America/Detroit
+starscream_require('inc/timezone-detroit.php');

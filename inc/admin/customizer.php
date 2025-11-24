@@ -35,7 +35,6 @@ if (!function_exists('starscream_customizer_require')) {
 /** Load submodules */
 foreach ([
   'inc/admin/customizer/helpers.php',
-  'inc/admin/customizer/logo.php',
   'inc/admin/customizer/colors.php',
   'inc/admin/customizer/fonts.php',
   'inc/admin/customizer/contact_hero.php',
@@ -69,7 +68,6 @@ if (!function_exists('starscream_customizer_require')) {
 /** Load each small module (each file should hook its own controls/settings) */
 $parts = [
   'inc/admin/customizer/helpers.php',
-  'inc/admin/customizer/logo.php',
   'inc/admin/customizer/colors.php',       // header_bg, footer_bg, header_text, footer_text, accent
   'inc/admin/customizer/fonts.php',        // header_footer_font
   'inc/admin/customizer/contact_hero.php', // phone, email, hero video

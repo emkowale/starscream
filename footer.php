@@ -30,13 +30,19 @@ if ( is_front_page() || is_home() || ( function_exists('is_shop') && is_shop() )
     <!-- Column 1: Logo -->
     <div class="bt-footer-col bt-footer-logo">
       <?php
-      $logo_id  = get_theme_mod('custom_logo');
-      $logo_url = ($logo_id) ? wp_get_attachment_url($logo_id) : '';
-      if (!empty($logo_url)) :
+      $logo_id = (int) get_theme_mod('custom_logo');
+      if ($logo_id) {
+        $logo = wp_get_attachment_image($logo_id, 'full', false, [
+          'class' => 'custom-logo btx-footer-logo',
+          'alt'   => get_bloginfo('name'),
+        ]);
+        echo '<a href="'.esc_url(home_url('/')).'" class="custom-logo-link" rel="home">'.$logo.'</a>';
+      } else {
+        echo '<a href="'.esc_url(home_url('/')).'" class="site-title">'
+          . esc_html(get_bloginfo('name'))
+          . '</a>';
+      }
       ?>
-        <img src="<?php echo esc_url($logo_url); ?>"
-             alt="<?php echo esc_attr(get_bloginfo('name')); ?> logo" />
-      <?php endif; ?>
     </div>
 
     <!-- Column 2: Copy -->
@@ -53,7 +59,7 @@ if ( is_front_page() || is_home() || ( function_exists('is_shop') && is_shop() )
         $icon = get_theme_mod("social_icon_$i");
         $url  = get_theme_mod("social_url_$i");
         if (!empty($icon) && !empty($url)) : ?>
-          <a href="<?php echo esc_url($url); ?>" target="_blank" rel="noopener">
+          <a href="<?php echo esc_url($url); ?>" target="_blank" rel="noopener" style="color: var(--accent-color);">
             <i class="<?php echo esc_attr($icon); ?>"></i>
           </a>
         <?php endif;

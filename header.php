@@ -32,21 +32,17 @@
   <div class="btx-header-bar">
     <div class="site-logo">
       <?php
-      $company_logo_id = (int) get_theme_mod('company_logo_id', 0);
-
-      if ( has_custom_logo() ) {
-          echo get_custom_logo();
-      } elseif ( $company_logo_id ) {
-          echo '<a href="'.esc_url(home_url('/')).'" class="custom-logo-link" rel="home">'
-            . wp_get_attachment_image($company_logo_id, 'full', false, [
-                'class' => 'custom-logo',
-                'alt'   => get_bloginfo('name'),
-              ])
-            . '</a>';
+      $logo_id = (int) get_theme_mod('custom_logo', 0);
+      if ($logo_id) {
+        $logo = wp_get_attachment_image($logo_id, 'full', false, [
+          'class' => 'custom-logo btx-header-logo',
+          'alt'   => get_bloginfo('name'),
+        ]);
+        echo '<a href="'.esc_url(home_url('/')).'" class="custom-logo-link" rel="home">'.$logo.'</a>';
       } else {
-          echo '<a href="'.esc_url(home_url('/')).'" class="site-title">'
-            . esc_html(get_bloginfo('name'))
-            . '</a>';
+        echo '<a href="'.esc_url(home_url('/')).'" class="site-title">'
+          . esc_html(get_bloginfo('name'))
+          . '</a>';
       }
       ?>
     </div>
