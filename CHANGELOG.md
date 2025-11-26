@@ -1,3 +1,7 @@
+## v1.4.57 - 2025-11-26
+
+- chore: snapshot before release
+
 ## v1.4.56 - 2025-11-26
 
 - chore: snapshot before release
