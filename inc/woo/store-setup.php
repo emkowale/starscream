@@ -49,7 +49,7 @@ add_action('init', function () {
 }, 20);
 
 // Shipping: USA zone with flat/free + $2 when cart > $10
-add_action('init', function () {
+add_action('woocommerce_init', function () {
   if (!class_exists('WC_Shipping_Zones')) return;
   $zones = WC_Shipping_Zones::get_zones();
   $zone_id = null;
@@ -68,25 +68,31 @@ add_action('init', function () {
   $methods_all = $zone->get_shipping_methods(false);
   $flat = $free = null;
   foreach ($methods_all as $instance_id => $m) {
-    if ($m->method_id === 'flat_rate') {
+    if (is_object($m) && $m->id === 'flat_rate') {
       if ($flat) { $zone->delete_shipping_method($instance_id); continue; }
       $flat = $m;
     }
-    if ($m->method_id === 'free_shipping') {
+    if (is_object($m) && $m->id === 'free_shipping') {
       if ($free) { $zone->delete_shipping_method($instance_id); continue; }
       $free = $m;
     }
   }
 
-  if (!$flat) { $zone->add_shipping_method('flat_rate'); foreach ($zone->get_shipping_methods(true) as $m) { if ($m->method_id === 'flat_rate') { $flat = $m; break; } } }
+  if (!$flat) { $zone->add_shipping_method('flat_rate'); foreach ($zone->get_shipping_methods(true) as $m) { if (is_object($m) && $m->id === 'flat_rate') { $flat = $m; break; } } }
   if ($flat) { $flat->update_option('title', 'Flat Rate'); $flat->update_option('cost', '10'); $flat->update_option('tax_status', 'none'); }
-  if (!$free) { $zone->add_shipping_method('free_shipping'); foreach ($zone->get_shipping_methods(true) as $m) { if ($m->method_id === 'free_shipping') { $free = $m; break; } } }
+  if (!$free) { $zone->add_shipping_method('free_shipping'); foreach ($zone->get_shipping_methods(true) as $m) { if (is_object($m) && $m->id === 'free_shipping') { $free = $m; break; } } }
   if ($free) { $free->update_option('requires', 'either'); $free->update_option('min_amount', '100'); }
 }, 25);
 
 add_filter('woocommerce_package_rates', function ($rates, $package) {
   foreach ($rates as $r) { if ($r->method_id === 'free_shipping') return array_filter($rates, fn($x) => $x->method_id === 'free_shipping'); }
-  $subtotal = (WC()->cart && !is_admin()) ? WC()->cart->get_displayed_subtotal() : 0;
-  if ($subtotal > 10) foreach ($rates as $key => $rate) if ($rate->method_id === 'flat_rate') $rates[$key]->cost = 2;
+  $cart_total = 0;
+  if (WC()->cart && !is_admin()) {
+    // Use subtotal minus discounts (no shipping) to determine threshold.
+    $subtotal = WC()->cart->get_displayed_subtotal();
+    $discounts = WC()->cart->get_discount_total() + WC()->cart->get_discount_tax();
+    $cart_total = max(0, $subtotal - $discounts);
+  }
+  if ($cart_total > 10) foreach ($rates as $key => $rate) if ($rate->method_id === 'flat_rate') $rates[$key]->cost = 2;
   return $rates;
 }, 10, 2);
