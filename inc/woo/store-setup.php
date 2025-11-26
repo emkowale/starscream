@@ -3,8 +3,8 @@ if (!defined('ABSPATH')) exit;
 
 // Core store defaults
 add_action('init', function () {
-  update_option('woocommerce_store_address', '901 Waterway Pl. Suite B');
-  update_option('woocommerce_store_address_2', '');
+  update_option('woocommerce_store_address', '901 Waterway Pl.');
+  update_option('woocommerce_store_address_2', 'Suite B');
   update_option('woocommerce_store_city', 'Longwood');
   update_option('woocommerce_default_country', 'US:FL');
   update_option('woocommerce_store_postcode', '32750');
@@ -48,7 +48,7 @@ add_action('init', function () {
   update_option('starscream_tax_seeded', 1);
 }, 20);
 
-// Shipping: USA zone with flat/free + $2 under $10
+// Shipping: USA zone with flat/free + $2 when cart > $10
 add_action('init', function () {
   if (!class_exists('WC_Shipping_Zones')) return;
   $zones = WC_Shipping_Zones::get_zones();
@@ -63,9 +63,21 @@ add_action('init', function () {
   }
   $zone->set_locations([['code' => 'US', 'type' => 'country']]);
   $zone->save();
-  $methods = $zone->get_shipping_methods(true);
+
+  // Dedupe methods so only one flat + one free remain.
+  $methods_all = $zone->get_shipping_methods(false);
   $flat = $free = null;
-  foreach ($methods as $m) { if ($m->method_id === 'flat_rate') $flat = $m; if ($m->method_id === 'free_shipping') $free = $m; }
+  foreach ($methods_all as $instance_id => $m) {
+    if ($m->method_id === 'flat_rate') {
+      if ($flat) { $zone->delete_shipping_method($instance_id); continue; }
+      $flat = $m;
+    }
+    if ($m->method_id === 'free_shipping') {
+      if ($free) { $zone->delete_shipping_method($instance_id); continue; }
+      $free = $m;
+    }
+  }
+
   if (!$flat) { $zone->add_shipping_method('flat_rate'); foreach ($zone->get_shipping_methods(true) as $m) { if ($m->method_id === 'flat_rate') { $flat = $m; break; } } }
   if ($flat) { $flat->update_option('title', 'Flat Rate'); $flat->update_option('cost', '10'); $flat->update_option('tax_status', 'none'); }
   if (!$free) { $zone->add_shipping_method('free_shipping'); foreach ($zone->get_shipping_methods(true) as $m) { if ($m->method_id === 'free_shipping') { $free = $m; break; } } }
@@ -75,6 +87,6 @@ add_action('init', function () {
 add_filter('woocommerce_package_rates', function ($rates, $package) {
   foreach ($rates as $r) { if ($r->method_id === 'free_shipping') return array_filter($rates, fn($x) => $x->method_id === 'free_shipping'); }
   $subtotal = (WC()->cart && !is_admin()) ? WC()->cart->get_displayed_subtotal() : 0;
-  if ($subtotal < 10) foreach ($rates as $key => $rate) if ($rate->method_id === 'flat_rate') $rates[$key]->cost = 2;
+  if ($subtotal > 10) foreach ($rates as $key => $rate) if ($rate->method_id === 'flat_rate') $rates[$key]->cost = 2;
   return $rates;
 }, 10, 2);

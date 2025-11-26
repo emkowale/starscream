@@ -76,6 +76,9 @@ starscream_require('inc/woo/variations-lite.php');
 // Add-only: quiet product gallery (no lightbox, keep hover zoom, disable click)
 starscream_require('inc/woo/gallery-quiet.php');
 
+// Force site visibility to "live" (public)
+starscream_require('inc/site-visibility.php');
+
 // Brand the WP login screen with Starscream colors/logo
 starscream_require('inc/login/style.php');
 
