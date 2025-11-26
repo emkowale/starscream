@@ -54,9 +54,15 @@ add_action('init', function () {
   $zones = WC_Shipping_Zones::get_zones();
   $zone_id = null;
   foreach ($zones as $z) { if ($z['zone_name'] === 'USA') { $zone_id = $z['zone_id']; break; } }
-  if (!$zone_id) $zone_id = WC_Shipping_Zones::add_zone(['zone_name' => 'USA']);
-  $zone = new WC_Shipping_Zone($zone_id);
+  if (!$zone_id) {
+    $zone = new WC_Shipping_Zone();
+    $zone->set_zone_name('USA');
+    $zone_id = $zone->save();
+  } else {
+    $zone = new WC_Shipping_Zone($zone_id);
+  }
   $zone->set_locations([['code' => 'US', 'type' => 'country']]);
+  $zone->save();
   $methods = $zone->get_shipping_methods(true);
   $flat = $free = null;
   foreach ($methods as $m) { if ($m->method_id === 'flat_rate') $flat = $m; if ($m->method_id === 'free_shipping') $free = $m; }
