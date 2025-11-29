@@ -3,11 +3,11 @@ if (!defined('ABSPATH')) exit;
 
 // Core store defaults
 add_action('init', function () {
-  update_option('woocommerce_store_address', '901 Waterway Pl.');
-  update_option('woocommerce_store_address_2', 'Suite B');
-  update_option('woocommerce_store_city', 'Longwood');
-  update_option('woocommerce_default_country', 'US:FL');
-  update_option('woocommerce_store_postcode', '32750');
+  update_option('woocommerce_store_address', '7555 Midland Road');
+  update_option('woocommerce_store_address_2', '');
+  update_option('woocommerce_store_city', 'Freeland');
+  update_option('woocommerce_default_country', 'US:MI');
+  update_option('woocommerce_store_postcode', '48623');
   update_option('woocommerce_allowed_countries', 'specific');
   update_option('woocommerce_specific_allowed_countries', ['US']);
   update_option('woocommerce_ship_to_countries', 'selling');
@@ -15,37 +15,44 @@ add_action('init', function () {
   update_option('blog_public', '1');
 });
 
-// Seed US tax rates once
+// Seed Michigan-only tax rate
 add_action('init', function () {
-  if (get_option('starscream_tax_seeded')) return;
   if (!class_exists('WC_Tax')) return;
   global $wpdb;
   $table = $wpdb->prefix . 'woocommerce_tax_rates';
-  $rates = [
-    ['AK','0'],['AL','4'],['AR','6.5'],['AZ','5.6'],['CA','7.25'],['CO','2.9'],['CT','6.35'],['DC','6'],
-    ['DE','0'],['FL','6'],['GA','4'],['HI','4'],['IA','6'],['ID','6'],['IL','6.25'],['IN','7'],
-    ['KS','6.5'],['KY','6'],['LA','4.45'],['MA','6.25'],['MD','6'],['ME','5.5'],['MI','6'],['MN','6.88'],
-    ['MO','4.23'],['MS','7'],['MT','0'],['NC','4.75'],['ND','5'],['NE','5.5'],['NH','0'],['NJ','6.63'],
-    ['NM','5.13'],['NV','4.6'],['NY','4'],['OH','5.75'],['OK','4.5'],['OR','0'],['PA','6'],['RI','7'],
-    ['SC','6'],['SD','4.5'],['TN','7'],['TX','6.25'],['UT','4.7'],['VA','4.3'],['VT','6'],['WA','6.5'],
-    ['WI','5'],['WV','6'],['WY','4'],
+  // Remove any US state tax rates except Michigan to keep taxes MI-only.
+  $wpdb->query($wpdb->prepare(
+    "DELETE FROM $table WHERE tax_rate_country=%s AND tax_rate_state <> %s",
+    'US',
+    'MI'
+  ));
+
+  $data = [
+    'tax_rate_country' => 'US',
+    'tax_rate_state' => 'MI',
+    'tax_rate' => '6',
+    'tax_rate_name' => 'Michigan Sales Tax',
+    'tax_rate_priority' => 1,
+    'tax_rate_compound' => 0,
+    'tax_rate_shipping' => 1,
+    'tax_rate_order' => 0,
+    'tax_rate_class' => '',
   ];
-  foreach ($rates as [$state, $rate]) {
-    $exists = $wpdb->get_var($wpdb->prepare("SELECT tax_rate_id FROM $table WHERE tax_rate_country='US' AND tax_rate_state=%s LIMIT 1", $state));
-    if ($exists) continue;
-    $wpdb->insert($table, [
-      'tax_rate_country' => 'US',
-      'tax_rate_state' => $state,
-      'tax_rate' => $rate,
-      'tax_rate_name' => 'Sales Tax',
-      'tax_rate_priority' => 1,
-      'tax_rate_compound' => 0,
-      'tax_rate_shipping' => 1,
-      'tax_rate_order' => 0,
-      'tax_rate_class' => '',
-    ]);
+
+  $existing = $wpdb->get_var($wpdb->prepare(
+    "SELECT tax_rate_id FROM $table WHERE tax_rate_country=%s AND tax_rate_state=%s LIMIT 1",
+    'US',
+    'MI'
+  ));
+
+  if ($existing) {
+    $wpdb->update($table, $data, ['tax_rate_id' => $existing]);
+  } else {
+    $wpdb->insert($table, $data);
   }
-  update_option('starscream_tax_seeded', 1);
+
+  update_option('starscream_tax_seeded_mi_only', 1);
+  delete_option('starscream_tax_seeded');
 }, 20);
 
 // Shipping: USA zone with flat/free + $2 when cart > $10
