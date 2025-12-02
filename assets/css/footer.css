@@ -127,11 +127,6 @@ footer.site-footer a:hover{
   color: var(--btx-text);
 }
 
-/* Hide the legacy blue paginator that comes right after the products grid */
-ul.products + nav.woocommerce-pagination {
-  display: none !important;
-}
-
 .bt-footer-col.bt-footer-socials.footer-socials {
   text-align: center;
 }
