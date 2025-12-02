@@ -13,11 +13,15 @@ document.addEventListener('DOMContentLoaded', function () {
   var nav = (headerBar && headerBar.querySelector('.site-nav')) ? headerBar.querySelector('.site-nav') : injectedNav;
   if (!nav) return;
 
+  // No menu items? Skip building a toggle so the mobile hamburger stays hidden.
+  if (!nav.querySelector('li')) return;
+
   // Ensure it has an id for aria-controls.
   if (!nav.id) nav.id = 'primary-menu';
 
   // If header is present, create a hamburger before nav; otherwise leave nav as-is.
   if (headerBar) {
+    headerBar.classList.add('has-nav-toggle');
     var btn = document.createElement('button');
     btn.className = 'btx-nav-toggle';
     btn.setAttribute('aria-controls', nav.id);

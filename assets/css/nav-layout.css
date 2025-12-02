@@ -52,6 +52,7 @@
 
   /* Reserve space so the floating button doesn't overlap the logo */
   .btx-header-bar{ padding-left: 0px; }
+  .btx-header-bar.has-nav-toggle{ padding-left: 25px; }
 
   /* Keep contact info on one line */
   .header-icons{ flex-wrap: nowrap; gap: 14px; }
