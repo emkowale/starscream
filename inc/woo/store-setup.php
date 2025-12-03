@@ -34,7 +34,7 @@ add_action('init', function () {
     'tax_rate_name' => 'Michigan Sales Tax',
     'tax_rate_priority' => 1,
     'tax_rate_compound' => 0,
-    'tax_rate_shipping' => 1,
+    'tax_rate_shipping' => 0, // Shipping not taxed when itemized in MI
     'tax_rate_order' => 0,
     'tax_rate_class' => '',
   ];
