@@ -1,3 +1,7 @@
+## v1.4.66 - 2025-12-03
+
+_No commit details available on this machine_
+
 ## v1.4.65 - 2025-12-03
 
 - chore: snapshot before release
