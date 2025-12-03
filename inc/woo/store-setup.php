@@ -55,7 +55,7 @@ add_action('init', function () {
   delete_option('starscream_tax_seeded');
 }, 20);
 
-// Shipping: USA zone with flat/free + $2 when cart > $10
+// Shipping: USA zone with flat/free + $2 when cart < $10
 add_action('woocommerce_init', function () {
   if (!class_exists('WC_Shipping_Zones')) return;
   $zones = WC_Shipping_Zones::get_zones();
@@ -100,6 +100,9 @@ add_filter('woocommerce_package_rates', function ($rates, $package) {
     $discounts = WC()->cart->get_discount_total() + WC()->cart->get_discount_tax();
     $cart_total = max(0, $subtotal - $discounts);
   }
-  if ($cart_total > 10) foreach ($rates as $key => $rate) if ($rate->method_id === 'flat_rate') $rates[$key]->cost = 2;
+  foreach ($rates as $key => $rate) {
+    if ($rate->method_id !== 'flat_rate') continue;
+    $rates[$key]->cost = ($cart_total < 10) ? 2 : 10;
+  }
   return $rates;
 }, 10, 2);
