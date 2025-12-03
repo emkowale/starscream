@@ -95,10 +95,8 @@ add_filter('woocommerce_package_rates', function ($rates, $package) {
   foreach ($rates as $r) { if ($r->method_id === 'free_shipping') return array_filter($rates, fn($x) => $x->method_id === 'free_shipping'); }
   $cart_total = 0;
   if (WC()->cart && !is_admin()) {
-    // Use subtotal minus discounts (no shipping) to determine threshold.
-    $subtotal = WC()->cart->get_displayed_subtotal();
-    $discounts = WC()->cart->get_discount_total() + WC()->cart->get_discount_tax();
-    $cart_total = max(0, $subtotal - $discounts);
+    // Use original subtotal before coupons (no shipping) to determine threshold.
+    $cart_total = max(0, WC()->cart->get_subtotal());
   }
   foreach ($rates as $key => $rate) {
     if ($rate->method_id !== 'flat_rate') continue;
