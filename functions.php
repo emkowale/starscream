@@ -70,6 +70,9 @@ starscream_require('inc/enqueue/nav-tabs.php');
 // Add-only: nav layout (menu under logo on desktop; full-screen overlay mobile)
 starscream_require('inc/enqueue/nav-layout.php');
 
+// Styled replacements for window.alert()
+starscream_require('inc/enqueue/alerts.php');
+
 // Add-only: Woo variations (auto-select + hide single-choice/internal attrs)
 starscream_require('inc/woo/variations-lite.php');
 
@@ -96,3 +99,9 @@ starscream_require('inc/woo/disable-customer-emails.php');
 
 // Force site timezone to America/Detroit
 starscream_require('inc/timezone-detroit.php');
+
+// Force permalinks to Post name + Woo product base /product/%product_cat%/
+starscream_require('inc/theme/permalinks.php');
+
+// Rename default "Uncategorized" category to "General" with slug "general"
+starscream_require('inc/theme/default-category.php');
