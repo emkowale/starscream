@@ -1,5 +1,46 @@
 ## v1.4.68 - 2025-12-06
 
+## [1.4.71] - 2026-02-20
+
+### Changes
+* chore: sync live starscream files after repo repair (47ec398)
+* chore(release): v1.4.68 (7da21a2)
+* chore: snapshot before release (160a0b1)
+* chore(release): v1.4.67 (1baf9ba)
+* chore(release): v1.4.66 (d888412)
+* chore(release): v1.4.65 (436ec4a)
+* chore: snapshot before release (b4ece8c)
+* chore(release): v1.4.64 (03a6bc0)
+* chore(release): v1.4.63 (dc2d965)
+* chore: snapshot before release (b6134ef)
+* chore(release): v1.4.62 (4c1575a)
+* chore: snapshot before release (a6ba0b6)
+* chore(release): v1.4.61 (b63f02b)
+* chore: snapshot before release (0e5da21)
+* chore(release): v1.4.60 (6ce9ca1)
+* chore: snapshot before release (6c81c3e)
+* chore(release): v1.4.59 (d803008)
+* chore: snapshot before release (ce98e7e)
+* chore(release): v1.4.58 (45cf24f)
+* chore: snapshot before release (0e7d62c)
+* chore(release): v1.4.57 (d505a4a)
+* chore: snapshot before release (c07b1a5)
+* chore(release): v1.4.56 (7acd4df)
+* chore: snapshot before release (d3c3152)
+* chore(release): v1.4.55 (b561297)
+* chore: snapshot before release (18ba584)
+* chore(release): v1.4.54 (0af6e47)
+* chore: snapshot before release (7a6c759)
+* chore(release): v1.4.53 (3f07bb2)
+* chore: snapshot before release (972f67e)
+* chore(release): v1.4.52 (e72cc63)
+* chore: snapshot before release (946e99d)
+* chore(release): v1.4.51 (5faf1eb)
+* chore: snapshot before release (ffa4019)
+* chore(release): v1.4.49 (b8fd08c)
+* Initial import for Starscream theme (ef8d606)
+
+
 ## [1.4.70] - 2026-02-20
 
 ### Changes
