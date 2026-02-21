@@ -55,7 +55,7 @@ add_action('init', function () {
   delete_option('starscream_tax_seeded');
 }, 20);
 
-// Shipping: USA zone with flat/free + $2 when cart < $10
+// Shipping: USA zone with unconditional free shipping.
 add_action('woocommerce_init', function () {
   if (!class_exists('WC_Shipping_Zones')) return;
   $zones = WC_Shipping_Zones::get_zones();
@@ -86,21 +86,23 @@ add_action('woocommerce_init', function () {
   }
 
   if (!$flat) { $zone->add_shipping_method('flat_rate'); foreach ($zone->get_shipping_methods(true) as $m) { if (is_object($m) && $m->id === 'flat_rate') { $flat = $m; break; } } }
-  if ($flat) { $flat->update_option('title', 'Flat Rate'); $flat->update_option('cost', '10'); $flat->update_option('tax_status', 'none'); }
+  if ($flat) { $flat->update_option('title', 'Free Shipping'); $flat->update_option('cost', '0'); $flat->update_option('tax_status', 'none'); }
   if (!$free) { $zone->add_shipping_method('free_shipping'); foreach ($zone->get_shipping_methods(true) as $m) { if (is_object($m) && $m->id === 'free_shipping') { $free = $m; break; } } }
-  if ($free) { $free->update_option('requires', 'either'); $free->update_option('min_amount', '100'); }
+  if ($free) { $free->update_option('requires', ''); $free->update_option('min_amount', '0'); }
 }, 25);
 
 add_filter('woocommerce_package_rates', function ($rates, $package) {
+  // Prefer native free_shipping when present.
   foreach ($rates as $r) { if ($r->method_id === 'free_shipping') return array_filter($rates, fn($x) => $x->method_id === 'free_shipping'); }
-  $cart_total = 0;
-  if (WC()->cart && !is_admin()) {
-    // Use original subtotal before coupons (no shipping) to determine threshold.
-    $cart_total = max(0, WC()->cart->get_subtotal());
-  }
+
+  // Fallback: zero-out any returned rates so shipping is always free.
   foreach ($rates as $key => $rate) {
-    if ($rate->method_id !== 'flat_rate') continue;
-    $rates[$key]->cost = ($cart_total < 10) ? 2 : 10;
+    $rates[$key]->cost = 0;
+    if (is_array($rates[$key]->taxes)) {
+      foreach ($rates[$key]->taxes as $tax_key => $tax_amount) {
+        $rates[$key]->taxes[$tax_key] = 0;
+      }
+    }
   }
   return $rates;
 }, 10, 2);

@@ -124,16 +124,9 @@ if ( $is_shop_front ) {
         }
         woocommerce_product_loop_end();
 
-        // Basic pagination compatible with pretty permalinks
-        echo '<nav class="woocommerce-pagination">';
-        echo paginate_links([
-            'total'   => $loop->max_num_pages,
-            'current' => $paged,
-        ]);
-        echo '</nav>';
-
         wp_reset_postdata();
 
+        // Use WooCommerce's built-in pagination output.
         do_action('woocommerce_after_shop_loop');
 
     } else {
@@ -151,4 +144,3 @@ if ( $is_shop_front ) {
 ?>
 </main>
 <?php get_footer(); ?>
-

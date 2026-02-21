@@ -27,11 +27,8 @@ add_action('template_redirect', function () {
     while ($loop->have_posts()){ $loop->the_post(); do_action('woocommerce_shop_loop'); wc_get_template_part('content','product'); }
     woocommerce_product_loop_end();
 
-    echo '<nav class="woocommerce-pagination">';
-    echo paginate_links(['total'=>max(1,(int)$loop->max_num_pages),'current'=>$paged]);
-    echo '</nav>';
-
     wp_reset_postdata();
+    // Use WooCommerce's built-in pagination output.
     do_action('woocommerce_after_shop_loop');
   } else {
     do_action('woocommerce_no_products_found');
