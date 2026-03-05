@@ -1,5 +1,11 @@
 ## v1.4.68 - 2025-12-06
 
+## [1.5.2] - 2026-03-05
+
+### Changes
+* chore: import live theme snapshot (2bdc027)
+
+
 ## [1.5.0] - 2026-03-01
 
 ### Changes
