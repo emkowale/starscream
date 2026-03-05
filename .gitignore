@@ -1,0 +1,16 @@
+# macOS
+.DS_Store
+
+# IDE
+.vscode/
+.idea/
+
+# Build artifacts & zips
+node_modules/
+vendor/
+*.log
+*.zip
+*.map
+dist/
+build/
+.cache/

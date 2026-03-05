@@ -1,0 +1,14 @@
+/*
+ * File: assets/css/product-gallery.css
+ * Description: Slide-in animation for Woo main image.
+ * Plugin: Starscream
+ * Author: Eric Kowalewski
+ * Last Updated: 2025-09-02 (EDT)
+ */
+.woocommerce-product-gallery__wrapper{
+  transition:transform .35s ease,opacity .35s ease;will-change:transform,opacity;
+}
+.woocommerce-product-gallery__wrapper.ss-anim{transform:translateX(28px);opacity:.05;}
+.woocommerce-product-gallery__wrapper.ss-anim.ss-anim-in{transform:translateX(0);opacity:1;}
+.woocommerce div.product div.images .flex-control-thumbs li img,
+.woocommerce div.product div.images .woocommerce-product-gallery__thumbnail img{cursor:pointer;}

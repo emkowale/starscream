@@ -1,0 +1,27 @@
+/* Site-wide Woo buttons */
+:root{ --btx-accent:#ffc107; --btx-accent-text:#111; --btx-radius:12px; }
+
+.woocommerce a.button,
+.woocommerce button.button,
+.woocommerce input.button,
+.woocommerce #respond input#submit,
+.woocommerce .checkout-button,
+.woocommerce .single_add_to_cart_button,
+.woocommerce .wc-proceed-to-checkout a.checkout-button{
+  background:var(--accent-color) !important; color:var(--btx-accent-text) !important;
+  border:0 !important; border-radius:var(--btx-radius) !important;
+  padding:12px 18px !important; font-weight:600 !important; text-decoration:none !important;
+  box-shadow:0 2px 0 rgba(0,0,0,.08); transition:transform .12s ease, filter .12s ease;
+}
+.woocommerce a.button:hover,
+.woocommerce button.button:hover,
+.woocommerce input.button:hover,
+.woocommerce #respond input#submit:hover,
+.woocommerce .checkout-button:hover,
+.woocommerce .single_add_to_cart_button:hover,
+.woocommerce .wc-proceed-to-checkout a.checkout-button:hover{
+  filter:brightness(0.95); transform:translateY(-1px);
+}
+.woocommerce a.button:disabled,
+.woocommerce button.button:disabled,
+.woocommerce input.button:disabled{ opacity:.6 !important; cursor:not-allowed !important; }

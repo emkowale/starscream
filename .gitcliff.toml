@@ -1,0 +1,30 @@
+[changelog]
+header = "# Changelog\n\nAll notable changes are documented here."
+body = """
+{% for group, commits in commits | group_by(attribute="group") %}
+## {{ group | upper }}
+{% for c in commits -%}
+- {{ c.message | trim }} ({{ c.id | truncate(length=7, end="") }}){% if c.breaking %} **BREAKING**{% endif %}
+{%- endfor %}
+
+{% endfor -%}
+"""
+footer = ""
+trim = true
+
+[git]
+conventional_commits = true
+filter_unconventional = false
+tag_pattern = "v*"
+protect_breaking_commits = true
+commit_parsers = [
+  { message = "^feat", group = "Features" },
+  { message = "^fix", group = "Fixes" },
+  { message = "^perf", group = "Performance" },
+  { message = "^refactor", group = "Refactor" },
+  { message = "^docs", group = "Docs" },
+  { message = "^style", group = "Style" },
+  { message = "^test", group = "Tests" },
+  { message = "^chore", group = "Chores" },
+  { message = ".*", group = "Other" }
+]
