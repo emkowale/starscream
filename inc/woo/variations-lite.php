@@ -8,6 +8,20 @@ if (!defined('ABSPATH')) exit;
  * - If exactly one purchasable variation exists, wire it & hide picker
  */
 
+if (!function_exists('starscream_get_single_purchasable_variation')) {
+  function starscream_get_single_purchasable_variation($product) {
+    if (!$product instanceof WC_Product_Variable) return null;
+
+    $vars = array_values($product->get_available_variations());
+    if (count($vars) !== 1) return null;
+
+    $v = $vars[0];
+    if (empty($v['is_in_stock'])) return null;
+
+    return $v;
+  }
+}
+
 /* Prefer a sensible selection if none chosen */
 add_filter('woocommerce_dropdown_variation_attribute_options_args', function ($args) {
   if (empty($args['product']) || empty($args['attribute'])) return $args;
@@ -37,14 +51,18 @@ add_filter('woocommerce_dropdown_variation_attribute_options_html', function ($h
   return $hide ? $html . '<span class="bt-should-hide" data-attr="'.esc_attr($tax).'"></span>' : $html;
 }, 11, 2); // <-- accept 2 args
 
+/* Add a marker before the variations table when exactly one variation is purchasable */
+add_action('woocommerce_before_variations_form', function () {
+  global $product;
+  if (!starscream_get_single_purchasable_variation($product)) return;
+  echo '<span class="bt-hide-variations-marker" aria-hidden="true"></span>';
+}, 9);
+
 /* If exactly one purchasable variation, wire it + hide picker */
 add_action('woocommerce_before_add_to_cart_button', function () {
   global $product;
-  if (!$product instanceof WC_Product_Variable) return;
-
-  $vars = array_values($product->get_available_variations());
-  if (count($vars) !== 1) return;
-  $v = $vars[0]; if (empty($v['is_in_stock'])) return;
+  $v = starscream_get_single_purchasable_variation($product);
+  if (!$v) return;
 
   echo '<input type="hidden" class="variation_id" name="variation_id" value="'.esc_attr($v['variation_id']).'">';
   if (!empty($v['attributes']) && is_array($v['attributes'])) {
@@ -52,7 +70,6 @@ add_action('woocommerce_before_add_to_cart_button', function () {
       echo '<input type="hidden" name="'.esc_attr($name).'" value="'.esc_attr($val).'">';
     }
   }
-  echo '<style>.variations_form .variations{display:none!important}</style>';
 }, 9);
 
 /* JS: hide marked rows and trigger variation check */

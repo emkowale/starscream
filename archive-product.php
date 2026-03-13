@@ -37,7 +37,7 @@ function btx_vimeo_embed($url){
 }
 
 if ( $is_shop && $video ) : ?>
-  <section class="btx-hero">
+  <section class="btx-hero btx-hero--shop">
     <?php
     $lower = strtolower($video);
     if (strpos($lower,'youtube.com')!==false || strpos($lower,'youtu.be')!==false) {
@@ -81,9 +81,3 @@ if ( woocommerce_product_loop() ) {
 do_action('woocommerce_after_main_content');
 get_footer();
 ?>
-<style>
-.btx-hero{position:relative;margin:0 0 16px}
-.btx-hero-video{width:100%;height:auto;display:block}
-.btx-hero-embed{position:relative;width:100%;padding-top:56.25%}
-.btx-hero-embed iframe{position:absolute;inset:0;width:100%;height:100%}
-</style>

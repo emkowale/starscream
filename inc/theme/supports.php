@@ -9,6 +9,7 @@
 if (!defined('ABSPATH')) exit;
 
 add_action('after_setup_theme', function () {
+  add_theme_support('woocommerce');
   add_theme_support('custom-logo', [
     'height'=>200,'width'=>600,'flex-width'=>true,'flex-height'=>true,
   ]);

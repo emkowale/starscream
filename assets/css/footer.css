@@ -131,6 +131,10 @@ footer.site-footer a:hover{
   text-align: center;
 }
 
+.bt-footer-social-link {
+  color: var(--accent-color) !important;
+}
+
 .fa-brands, .fab {
   font-weight: 400;
   padding: 6px;

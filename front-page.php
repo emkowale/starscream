@@ -38,15 +38,7 @@ if ( $is_shop_front ) {
         $is_youtube = (strpos($lower,'youtube.com')!==false || strpos($lower,'youtu.be')!==false);
         $is_vimeo   = (strpos($lower,'vimeo.com')!==false);
 
-        // Minimal inline CSS (contained here to avoid theme CSS regressions)
-        echo '<style>
-            .btx-hero{position:relative;margin:0 0 16px}
-            .btx-hero-video{width:100%;height:auto;display:block}
-            .btx-hero-embed{position:relative;width:100%;padding-top:56.25%}
-            .btx-hero-embed iframe{position:absolute;inset:0;width:100%;height:100%}
-        </style>';
-
-        echo '<section class="btx-hero">';
+        echo '<section class="btx-hero btx-hero--shop">';
         if ($is_youtube) {
             // Normalize YouTube to /embed/
             $src = '';

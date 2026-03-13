@@ -55,7 +55,7 @@ add_action('init', function () {
   delete_option('starscream_tax_seeded');
 }, 20);
 
-// Shipping: USA zone with unconditional free shipping.
+// Shipping: USA zone with unconditional free shipping and local pickup.
 add_action('woocommerce_init', function () {
   if (!class_exists('WC_Shipping_Zones')) return;
   $zones = WC_Shipping_Zones::get_zones();
@@ -71,42 +71,115 @@ add_action('woocommerce_init', function () {
   $zone->set_locations([['code' => 'US', 'type' => 'country']]);
   $zone->save();
 
-  // Dedupe methods so only one flat + one free remain.
+  // Keep one free-shipping instance and one local-pickup instance.
   $methods_all = $zone->get_shipping_methods(false);
-  $flat = $free = null;
+  $free = $pickup = null;
   foreach ($methods_all as $instance_id => $m) {
-    if (is_object($m) && $m->id === 'flat_rate') {
-      if ($flat) { $zone->delete_shipping_method($instance_id); continue; }
-      $flat = $m;
-    }
-    if (is_object($m) && $m->id === 'free_shipping') {
+    if (!is_object($m)) continue;
+    if ($m->id === 'flat_rate') { $zone->delete_shipping_method($instance_id); continue; }
+    if ($m->id === 'free_shipping') {
       if ($free) { $zone->delete_shipping_method($instance_id); continue; }
       $free = $m;
+      continue;
+    }
+    if ($m->id === 'local_pickup') {
+      if ($pickup) { $zone->delete_shipping_method($instance_id); continue; }
+      $pickup = $m;
     }
   }
 
-  if (!$flat) { $zone->add_shipping_method('flat_rate'); foreach ($zone->get_shipping_methods(true) as $m) { if (is_object($m) && $m->id === 'flat_rate') { $flat = $m; break; } } }
-  if ($flat) { $flat->update_option('title', 'Flat rate: FREE SHIPPING'); $flat->update_option('cost', '0'); $flat->update_option('tax_status', 'none'); }
-  if (!$free) { $zone->add_shipping_method('free_shipping'); foreach ($zone->get_shipping_methods(true) as $m) { if (is_object($m) && $m->id === 'free_shipping') { $free = $m; break; } } }
-  if ($free) { $free->update_option('requires', ''); $free->update_option('min_amount', '0'); }
+  if (!$free) {
+    $zone->add_shipping_method('free_shipping');
+    foreach ($zone->get_shipping_methods(true) as $m) {
+      if (is_object($m) && $m->id === 'free_shipping') { $free = $m; break; }
+    }
+  }
+  if ($free) {
+    $free->update_option('title', 'Free shipping');
+    $free->update_option('requires', '');
+    $free->update_option('min_amount', '0');
+  }
+
+  if (!$pickup) {
+    $zone->add_shipping_method('local_pickup');
+    foreach ($zone->get_shipping_methods(true) as $m) {
+      if (is_object($m) && $m->id === 'local_pickup') { $pickup = $m; break; }
+    }
+  }
+  if ($pickup) {
+    $pickup->update_option('title', 'Local pickup');
+    $pickup->update_option('cost', '0');
+    $pickup->update_option('tax_status', 'none');
+  }
 }, 25);
 
 add_filter('woocommerce_package_rates', function ($rates, $package) {
-  $forced_label = 'Flat rate: FREE SHIPPING';
+  $filtered = [];
+  $has_free = false;
+  $has_pickup = false;
 
-  // Force all returned shipping options to free with a consistent label.
   foreach ($rates as $key => $rate) {
-    $rates[$key]->label = $forced_label;
-    $rates[$key]->cost = 0;
-    if (is_array($rates[$key]->taxes)) {
-      foreach ($rates[$key]->taxes as $tax_key => $tax_amount) {
-        $rates[$key]->taxes[$tax_key] = 0;
+    if (!is_object($rate)) continue;
+
+    $method_id = method_exists($rate, 'get_method_id') ? $rate->get_method_id() : ($rate->method_id ?? '');
+
+    if ($method_id === 'free_shipping') {
+      if ($has_free) continue;
+      $has_free = true;
+      $rate->label = 'Free shipping';
+      $rate->cost = 0;
+      if (is_array($rate->taxes)) {
+        foreach ($rate->taxes as $tax_key => $tax_amount) {
+          $rate->taxes[$tax_key] = 0;
+        }
       }
+      $filtered[$key] = $rate;
+      continue;
+    }
+
+    if ($method_id === 'local_pickup') {
+      if ($has_pickup) continue;
+      $has_pickup = true;
+      $rate->label = 'Local pickup';
+      $rate->cost = 0;
+      if (is_array($rate->taxes)) {
+        foreach ($rate->taxes as $tax_key => $tax_amount) {
+          $rate->taxes[$tax_key] = 0;
+        }
+      }
+      $filtered[$key] = $rate;
     }
   }
-  return $rates;
+
+  // Fallback for stores still carrying an old zero-cost flat-rate instance.
+  if (!$has_free) {
+    foreach ($rates as $key => $rate) {
+      if (!is_object($rate)) continue;
+      $method_id = method_exists($rate, 'get_method_id') ? $rate->get_method_id() : ($rate->method_id ?? '');
+      $cost = method_exists($rate, 'get_cost') ? (float) $rate->get_cost() : (float) ($rate->cost ?? 0);
+      if ($method_id !== 'flat_rate' || $cost > 0) continue;
+
+      $rate->label = 'Free shipping';
+      $rate->cost = 0;
+      if (is_array($rate->taxes)) {
+        foreach ($rate->taxes as $tax_key => $tax_amount) {
+          $rate->taxes[$tax_key] = 0;
+        }
+      }
+      $filtered = [$key => $rate] + $filtered;
+      break;
+    }
+  }
+
+  return $filtered;
 }, 10, 2);
 
 add_filter('woocommerce_cart_shipping_method_full_label', function ($label, $method) {
-  return 'Flat rate: FREE SHIPPING';
+  if (!is_object($method)) return $label;
+
+  $method_id = method_exists($method, 'get_method_id') ? $method->get_method_id() : ($method->method_id ?? '');
+  if ($method_id === 'free_shipping') return 'Free shipping';
+  if ($method_id === 'local_pickup') return 'Local pickup';
+
+  return $label;
 }, 10, 2);

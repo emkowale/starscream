@@ -1,0 +1,150 @@
+/*
+ * Reusable content-page composition helpers.
+ * Intended for normal WordPress pages/posts and marketing/landing layouts.
+ */
+
+.site-page-intro {
+  max-width: var(--site-content-max);
+  margin: 0 auto clamp(1.5rem, 3vw, 2.5rem);
+}
+
+.site-page-intro__eyebrow {
+  margin: 0 0 0.45rem;
+  color: var(--site-muted-color);
+  font-size: 0.82rem;
+  letter-spacing: 0.08em;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.site-page-intro__title {
+  margin: 0;
+  color: var(--site-heading-color);
+  line-height: 1.12;
+  font-size: clamp(1.9rem, 5vw, 3rem);
+}
+
+.site-page-intro__lead {
+  margin: 0.9rem 0 0;
+  color: var(--site-muted-color);
+  font-size: clamp(1rem, 2.2vw, 1.2rem);
+}
+
+.site-rich-text {
+  max-width: var(--site-content-max);
+  margin-inline: auto;
+  line-height: 1.65;
+}
+
+.site-rich-text > * + * {
+  margin-top: 1.05em;
+}
+
+.site-rich-text h2,
+.site-rich-text h3,
+.site-rich-text h4 {
+  color: var(--site-heading-color);
+  line-height: 1.25;
+}
+
+.site-rich-text h2 {
+  margin-top: 1.7em;
+  margin-bottom: 0.45em;
+}
+
+.site-rich-text ul,
+.site-rich-text ol {
+  padding-left: 1.3em;
+}
+
+.site-rich-text blockquote {
+  margin: 1.2em 0;
+  padding: 1rem 1.2rem;
+  border-left: 4px solid var(--site-accent-color);
+  background: var(--site-surface-soft-color);
+  border-radius: 0 var(--site-radius-sm) var(--site-radius-sm) 0;
+}
+
+.site-rich-text a:not(.site-btn) {
+  color: var(--site-accent-color);
+  text-decoration-thickness: 2px;
+  text-underline-offset: 3px;
+}
+
+.site-media-frame {
+  margin: 0;
+  border: 1px solid var(--site-border-color);
+  border-radius: var(--site-radius-md);
+  overflow: hidden;
+  background: var(--site-surface-color);
+  box-shadow: var(--site-shadow-soft);
+}
+
+.site-media-frame img,
+.site-media-frame video,
+.site-media-frame iframe {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+}
+
+/* Media helpers for swapping page images without rewriting page-specific CSS. */
+.site-media-frame--portrait img {
+  aspect-ratio: 4 / 5 !important;
+}
+
+.site-media-frame--landscape img {
+  aspect-ratio: 5 / 4 !important;
+}
+
+.site-media-frame--gallery img {
+  aspect-ratio: 4 / 3 !important;
+}
+
+.site-media-frame--wide img {
+  aspect-ratio: 16 / 9 !important;
+}
+
+.site-media-frame--natural img {
+  height: auto !important;
+  aspect-ratio: auto !important;
+  object-fit: contain !important;
+}
+
+.site-stack {
+  display: grid;
+  gap: var(--site-grid-gap);
+}
+
+.site-page-shell .wp-block-group.site-section {
+  padding-block: var(--site-section-space);
+}
+
+.site-page-shell .wp-block-group.site-section > .wp-block-group__inner-container {
+  width: min(var(--site-container-max), calc(100% - 2.5rem));
+  margin-inline: auto;
+}
+
+@media (max-width: 767px) {
+  .site-page-shell .wp-block-group.site-section > .wp-block-group__inner-container {
+    width: min(var(--site-container-max), calc(100% - 1.25rem));
+  }
+}
+
+/*
+ * Editor-authored homepage marquee content can pick up <br> tags from wpautop.
+ * Force the pill container to center its scrolling track and ignore those breaks.
+ */
+.site-page-shell.dus-home .dus-home__marquee {
+  display: flex;
+  align-items: center;
+}
+
+.site-page-shell.dus-home .dus-home__marquee-track {
+  align-items: center;
+  line-height: 1;
+}
+
+.site-page-shell.dus-home .dus-home__marquee-track br {
+  display: none;
+}
