@@ -88,6 +88,24 @@
   max-width: 100%;
 }
 
+.site-media-frame figcaption,
+.site-media-frame .wp-element-caption,
+.site-rich-text figure.wp-block-image figcaption,
+.site-rich-text .wp-caption .wp-caption-text,
+.site-rich-text .wp-element-caption,
+.site-rich-text .blocks-gallery-caption {
+  position: static;
+  inset: auto;
+  display: block;
+  margin: 0.85rem 0 0;
+  padding: 0;
+  background: none;
+  color: var(--site-muted-color);
+  font-size: 0.95rem;
+  line-height: 1.6;
+  text-align: center;
+}
+
 /* Media helpers for swapping page images without rewriting page-specific CSS. */
 .site-media-frame--portrait img {
   aspect-ratio: 4 / 5 !important;

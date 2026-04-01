@@ -218,22 +218,15 @@ if (!function_exists('starscream_google_reviews_build_queries')) {
     if ($location === '') return [];
 
     $queries = [$location];
-    $is_address_like = (bool) preg_match('/\d+/', $location);
-    if ($is_address_like) {
-      $queries[] = $location . ' store';
-      $queries[] = $location . ' business';
-      $queries[] = $location . ' uniforms';
-      $queries[] = $location . ' scrubs';
-    }
-
     $parts = array_values(array_filter(array_map('trim', explode(',', $location))));
+    if (count($parts) >= 3) {
+      $queries[] = implode(', ', array_slice($parts, 1));
+    }
+    if (count($parts) >= 4) {
+      $queries[] = $parts[0] . ', ' . implode(', ', array_slice($parts, -2));
+    }
     if (count($parts) >= 2) {
-      $city = $parts[count($parts) - 2];
-      $state_zip = $parts[count($parts) - 1];
-      if ($city !== '') {
-        $queries[] = 'uniform store ' . $city . ' ' . $state_zip;
-        $queries[] = 'medical scrubs ' . $city . ' ' . $state_zip;
-      }
+      $queries[] = implode(', ', array_slice($parts, 0, 2));
     }
 
     $seen = [];
@@ -300,6 +293,56 @@ if (!function_exists('starscream_google_reviews_merge_reviews')) {
   }
 }
 
+if (!function_exists('starscream_google_reviews_fetch_candidate_snapshot')) {
+  function starscream_google_reviews_fetch_candidate_snapshot($api_key, $candidate, $max_reviews) {
+    if (!is_array($candidate) || empty($candidate['place_id'])) {
+      return new WP_Error('google_reviews_invalid_candidate', 'Google Reviews candidate is missing a place_id.');
+    }
+
+    $place_id = trim((string) $candidate['place_id']);
+    if ($place_id === '') {
+      return new WP_Error('google_reviews_invalid_candidate', 'Google Reviews candidate is missing a place_id.');
+    }
+
+    $details_primary = starscream_google_reviews_fetch_place_details($api_key, $place_id, 'most_relevant');
+    $details_new_api = starscream_google_reviews_fetch_place_details_new_api($api_key, $place_id);
+
+    if (is_wp_error($details_primary) && is_wp_error($details_new_api)) {
+      return new WP_Error('google_reviews_no_details', 'Unable to fetch Google Place Details for the configured location.');
+    }
+
+    $details_base = !is_wp_error($details_primary) ? $details_primary : $details_new_api;
+    $reviews_primary = (!is_wp_error($details_primary) && isset($details_primary['reviews']) && is_array($details_primary['reviews'])) ? $details_primary['reviews'] : [];
+    $reviews_pool = $reviews_primary;
+
+    if (!is_wp_error($details_primary) && count($reviews_primary) < $max_reviews) {
+      $details_newest = starscream_google_reviews_fetch_place_details($api_key, $place_id, 'newest');
+      if (!is_wp_error($details_newest) && isset($details_newest['reviews']) && is_array($details_newest['reviews'])) {
+        $reviews_pool = starscream_google_reviews_merge_reviews($reviews_pool, $details_newest['reviews']);
+      }
+    }
+
+    if (!is_wp_error($details_primary) && count($reviews_pool) < $max_reviews) {
+      $details_default = starscream_google_reviews_fetch_place_details($api_key, $place_id, '');
+      if (!is_wp_error($details_default) && isset($details_default['reviews']) && is_array($details_default['reviews'])) {
+        $reviews_pool = starscream_google_reviews_merge_reviews($reviews_pool, $details_default['reviews']);
+      }
+    }
+
+    if (!is_wp_error($details_new_api) && isset($details_new_api['reviews']) && is_array($details_new_api['reviews'])) {
+      $reviews_pool = starscream_google_reviews_merge_reviews($reviews_pool, $details_new_api['reviews']);
+    }
+
+    return [
+      'place_id' => $place_id,
+      'details' => $details_base,
+      'reviews' => starscream_google_reviews_extract_five_star_reviews($reviews_pool, $max_reviews),
+      'review_pool' => $reviews_pool,
+      'user_ratings_total' => (int) ($details_base['user_ratings_total'] ?? 0),
+    ];
+  }
+}
+
 if (!function_exists('starscream_google_reviews_get_data')) {
   function starscream_google_reviews_get_data() {
     $api_key = starscream_google_reviews_clean_text((string) get_theme_mod('tbt_google_reviews_api_key', ''), 240);
@@ -322,7 +365,7 @@ if (!function_exists('starscream_google_reviews_get_data')) {
     }
 
     $cache_key = 'btx_greviews_' . md5(implode('|', [
-      'v5',
+      'v6',
       $api_key,
       $location,
       $place_id_override,
@@ -333,101 +376,95 @@ if (!function_exists('starscream_google_reviews_get_data')) {
       return $cached;
     }
 
-    $candidates = [];
-    if ($place_id_override !== '') {
-      $candidates[] = [
-        'place_id' => $place_id_override,
-        'place_name' => '',
-      ];
-    }
-
-    if ($location !== '') {
-      $resolved_place = starscream_google_reviews_resolve_place($api_key, $location);
-      if (!is_wp_error($resolved_place)) {
-        $candidates[] = $resolved_place;
-      }
-      $queries = starscream_google_reviews_build_queries($location);
-      foreach ($queries as $query) {
-        $search_candidates = starscream_google_reviews_text_search_candidates($api_key, $query, 3);
-        foreach ($search_candidates as $candidate) {
-          $candidates[] = $candidate;
-        }
-      }
-    }
-
-    if (!$candidates) {
-      return new WP_Error('google_reviews_no_place_candidates', 'No valid Google place candidates were returned for this location.');
-    }
-
-    $unique_candidates = [];
-    foreach ($candidates as $candidate) {
-      if (!is_array($candidate) || empty($candidate['place_id'])) continue;
-      $pid = (string) $candidate['place_id'];
-      if (isset($unique_candidates[$pid])) continue;
-      $unique_candidates[$pid] = [
-        'place_id' => $pid,
-        'place_name' => sanitize_text_field((string) ($candidate['place_name'] ?? '')),
-      ];
-    }
-    $candidates = array_values($unique_candidates);
-    if (!$candidates) {
-      return new WP_Error('google_reviews_no_place_candidates', 'No valid Google place candidates were returned for this location.');
-    }
-
     $selected_details = null;
     $selected_reviews = [];
     $selected_place_id = '';
     $selected_pool = [];
     $selected_rating_total = 0;
-    $best_five = -1;
-    $best_sample = -1;
-    $best_ratings_total = -1;
-    foreach ($candidates as $candidate) {
-      $details_primary = starscream_google_reviews_fetch_place_details($api_key, (string) $candidate['place_id'], 'most_relevant');
-      $details_new_api = starscream_google_reviews_fetch_place_details_new_api($api_key, (string) $candidate['place_id']);
 
-      if (is_wp_error($details_primary) && is_wp_error($details_new_api)) continue;
-      $details_base = !is_wp_error($details_primary) ? $details_primary : $details_new_api;
+    if ($place_id_override !== '') {
+      $snapshot = starscream_google_reviews_fetch_candidate_snapshot($api_key, [
+        'place_id' => $place_id_override,
+        'place_name' => '',
+      ], $max_reviews);
+      if (is_wp_error($snapshot)) {
+        return $snapshot;
+      }
 
-      $reviews_primary = (!is_wp_error($details_primary) && isset($details_primary['reviews']) && is_array($details_primary['reviews'])) ? $details_primary['reviews'] : [];
-      $reviews_pool = $reviews_primary;
-
-      if (!is_wp_error($details_primary) && count($reviews_primary) < $max_reviews) {
-        $details_newest = starscream_google_reviews_fetch_place_details($api_key, (string) $candidate['place_id'], 'newest');
-        if (!is_wp_error($details_newest) && isset($details_newest['reviews']) && is_array($details_newest['reviews'])) {
-          $reviews_pool = starscream_google_reviews_merge_reviews($reviews_pool, $details_newest['reviews']);
+      $selected_details = $snapshot['details'];
+      $selected_reviews = $snapshot['reviews'];
+      $selected_place_id = (string) $snapshot['place_id'];
+      $selected_pool = $snapshot['review_pool'];
+      $selected_rating_total = (int) $snapshot['user_ratings_total'];
+    } else {
+      $snapshot = null;
+      if ($location !== '') {
+        $resolved_place = starscream_google_reviews_resolve_place($api_key, $location);
+        if (!is_wp_error($resolved_place)) {
+          $snapshot = starscream_google_reviews_fetch_candidate_snapshot($api_key, $resolved_place, $max_reviews);
         }
       }
 
-      if (!is_wp_error($details_primary) && count($reviews_pool) < $max_reviews) {
-        $details_default = starscream_google_reviews_fetch_place_details($api_key, (string) $candidate['place_id'], '');
-        if (!is_wp_error($details_default) && isset($details_default['reviews']) && is_array($details_default['reviews'])) {
-          $reviews_pool = starscream_google_reviews_merge_reviews($reviews_pool, $details_default['reviews']);
+      if (is_array($snapshot) && isset($snapshot['details']) && is_array($snapshot['details'])) {
+        $selected_details = $snapshot['details'];
+        $selected_reviews = $snapshot['reviews'];
+        $selected_place_id = (string) $snapshot['place_id'];
+        $selected_pool = $snapshot['review_pool'];
+        $selected_rating_total = (int) $snapshot['user_ratings_total'];
+      } else {
+        $candidates = [];
+        foreach (starscream_google_reviews_build_queries($location) as $query) {
+          $search_candidates = starscream_google_reviews_text_search_candidates($api_key, $query, 3);
+          foreach ($search_candidates as $candidate) {
+            $candidates[] = $candidate;
+          }
         }
-      }
 
-      if (!is_wp_error($details_new_api) && isset($details_new_api['reviews']) && is_array($details_new_api['reviews'])) {
-        $reviews_pool = starscream_google_reviews_merge_reviews($reviews_pool, $details_new_api['reviews']);
-      }
+        if (!$candidates) {
+          return new WP_Error('google_reviews_no_place_candidates', 'No valid Google place candidates were returned for this location.');
+        }
 
-      $five_star = starscream_google_reviews_extract_five_star_reviews($reviews_pool, $max_reviews);
-      $five_count = count($five_star);
-      $sample_count = count($reviews_pool);
-      $candidate_ratings_total = (int) ($details_base['user_ratings_total'] ?? 0);
+        $unique_candidates = [];
+        foreach ($candidates as $candidate) {
+          if (!is_array($candidate) || empty($candidate['place_id'])) continue;
+          $pid = (string) $candidate['place_id'];
+          if (isset($unique_candidates[$pid])) continue;
+          $unique_candidates[$pid] = [
+            'place_id' => $pid,
+            'place_name' => sanitize_text_field((string) ($candidate['place_name'] ?? '')),
+          ];
+        }
+        $candidates = array_values($unique_candidates);
+        if (!$candidates) {
+          return new WP_Error('google_reviews_no_place_candidates', 'No valid Google place candidates were returned for this location.');
+        }
 
-      if (
-        $five_count > $best_five
-        || ($five_count === $best_five && $sample_count > $best_sample)
-        || ($five_count === $best_five && $sample_count === $best_sample && $candidate_ratings_total > $best_ratings_total)
-      ) {
-        $best_five = $five_count;
-        $best_sample = $sample_count;
-        $best_ratings_total = $candidate_ratings_total;
-        $selected_details = $details_base;
-        $selected_reviews = $five_star;
-        $selected_place_id = (string) ($candidate['place_id'] ?? '');
-        $selected_pool = $reviews_pool;
-        $selected_rating_total = $candidate_ratings_total;
+        $best_five = -1;
+        $best_sample = -1;
+        $best_ratings_total = -1;
+        foreach ($candidates as $candidate) {
+          $snapshot = starscream_google_reviews_fetch_candidate_snapshot($api_key, $candidate, $max_reviews);
+          if (is_wp_error($snapshot)) continue;
+
+          $five_count = count($snapshot['reviews']);
+          $sample_count = count($snapshot['review_pool']);
+          $candidate_ratings_total = (int) $snapshot['user_ratings_total'];
+
+          if (
+            $five_count > $best_five
+            || ($five_count === $best_five && $sample_count > $best_sample)
+            || ($five_count === $best_five && $sample_count === $best_sample && $candidate_ratings_total > $best_ratings_total)
+          ) {
+            $best_five = $five_count;
+            $best_sample = $sample_count;
+            $best_ratings_total = $candidate_ratings_total;
+            $selected_details = $snapshot['details'];
+            $selected_reviews = $snapshot['reviews'];
+            $selected_place_id = (string) $snapshot['place_id'];
+            $selected_pool = $snapshot['review_pool'];
+            $selected_rating_total = $candidate_ratings_total;
+          }
+        }
       }
     }
 
@@ -438,6 +475,7 @@ if (!function_exists('starscream_google_reviews_get_data')) {
     $data = [
       'place_id' => $selected_place_id,
       'place_name' => starscream_google_reviews_clean_text((string) ($selected_details['name'] ?? ''), 120),
+      'place_address' => starscream_google_reviews_clean_text((string) ($selected_details['formatted_address'] ?? ''), 160),
       'place_url' => esc_url_raw((string) ($selected_details['url'] ?? '')),
       'reviews' => $selected_reviews,
       'debug_user_ratings_total' => $selected_rating_total,
@@ -470,7 +508,9 @@ if (!function_exists('starscream_render_tbt_google_reviews_shortcode')) {
     $reviews = isset($data['reviews']) && is_array($data['reviews']) ? $data['reviews'] : [];
     if (!$reviews) {
       $place_name = starscream_google_reviews_clean_text((string) ($data['place_name'] ?? ''), 120);
+      $place_address = starscream_google_reviews_clean_text((string) ($data['place_address'] ?? ''), 160);
       $detail = $place_name !== '' ? (' for "' . $place_name . '"') : '';
+      if ($place_address !== '') $detail .= ' at "' . $place_address . '"';
       $sample_total = (int) ($data['debug_sample_total'] ?? 0);
       $sample_five = (int) ($data['debug_sample_five'] ?? 0);
       $ratings_total = (int) ($data['debug_user_ratings_total'] ?? 0);
