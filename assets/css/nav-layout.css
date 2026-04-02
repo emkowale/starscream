@@ -19,6 +19,9 @@
   .btx-site-header .site-nav .menu > li.btx-mobile-menu-meta{
     display:none !important;
   }
+  .btx-site-header .site-nav .menu > li > .btx-submenu-toggle{
+    display:none !important;
+  }
   /* Center menu between logo/actions and allow wrapping when needed */
   .btx-header-bar .site-nav .menu{
     justify-content:center;
@@ -182,11 +185,8 @@
     display:block;
     width:100%;
     position:relative;
-  }
-
-  .btx-site-header .site-nav #menu-main-menu > li{
-    padding-left:50px;
-    padding-right:50px;
+    padding-left:10px;
+    padding-right:10px;
     box-sizing:border-box;
   }
 
@@ -203,6 +203,27 @@
     font-weight:600;
     letter-spacing:.05em;
     text-transform:uppercase;
+  }
+  .btx-site-header .site-nav .menu > li > a::before,
+  .btx-site-header .site-nav .menu > li > a::after,
+  .btx-site-header .site-nav .menu > li > .sub-menu > li > a::before,
+  .btx-site-header .site-nav .menu > li > .sub-menu > li > a::after{
+    content:none !important;
+    display:none !important;
+  }
+  .btx-site-header .site-nav .menu > li.current-menu-item > a,
+  .btx-site-header .site-nav .menu > li.current-menu-ancestor > a,
+  .btx-site-header .site-nav .menu > li.current-menu-parent > a,
+  .btx-site-header .site-nav .menu > li.current_page_item > a,
+  .btx-site-header .site-nav .menu > li.current_page_parent > a,
+  .btx-site-header .site-nav .menu > li.current_page_ancestor > a,
+  .btx-site-header .site-nav .menu > li > .sub-menu > li.current-menu-item > a,
+  .btx-site-header .site-nav .menu > li > .sub-menu > li.current-menu-ancestor > a,
+  .btx-site-header .site-nav .menu > li > .sub-menu > li.current-menu-parent > a,
+  .btx-site-header .site-nav .menu > li > .sub-menu > li.current_page_item > a,
+  .btx-site-header .site-nav .menu > li > .sub-menu > li.current_page_parent > a,
+  .btx-site-header .site-nav .menu > li > .sub-menu > li.current_page_ancestor > a{
+    color:var(--accent-color);
   }
   .btx-site-header .site-nav .menu > li > a:hover,
   .btx-site-header .site-nav .menu > li > a:focus{
@@ -292,7 +313,7 @@
     display:block;
     width:100%;
     margin:0;
-    padding:0 0 0 14px;
+    padding:0;
     list-style:none;
     border-radius:0;
     box-shadow:none;
@@ -327,6 +348,12 @@
     font-size:1rem;
     letter-spacing:.03em;
     text-transform:none;
+  }
+  .btx-site-header .site-nav .menu > li > .sub-menu > li.btx-mobile-duplicate-link{
+    display:none;
+  }
+  .btx-site-header .site-nav .menu > li > .sub-menu > li > a::before{
+    align-items:center;
   }
   .btx-site-header .site-nav .menu > li > .sub-menu > li > a:hover,
   .btx-site-header .site-nav .menu > li > .sub-menu > li > a:focus{

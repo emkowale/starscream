@@ -1,0 +1,395 @@
+html.starscream-guide-frame,
+body.starscream-guide-frame {
+  margin: 0;
+  padding: 0;
+  background: #eef4f8;
+}
+
+body.starscream-guide-frame {
+  color: #0f172a;
+}
+
+.starscream-guide-page {
+  margin: 20px 20px 0 2px;
+}
+
+body.starscream-guide-frame .starscream-guide-page {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 24px;
+}
+
+.starscream-guide {
+  --guide-ink: #0f172a;
+  --guide-muted: #475569;
+  --guide-border: rgba(15, 23, 42, 0.1);
+  --guide-surface: #ffffff;
+  --guide-surface-soft: #f8fbff;
+  --guide-surface-strong: linear-gradient(155deg, #072b3d 0%, #0f6d8c 55%, #3ca7c4 100%);
+  display: grid;
+  grid-template-columns: 280px minmax(0, 1fr);
+  gap: 24px;
+  align-items: start;
+  color: var(--guide-ink);
+}
+
+.starscream-guide code {
+  font-size: 0.92em;
+}
+
+.starscream-guide .button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 36px;
+  padding: 0 14px;
+  border: 1px solid rgba(15, 23, 42, 0.14);
+  border-radius: 999px;
+  background: #ffffff;
+  color: #0f172a;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color 160ms ease, border-color 160ms ease, color 160ms ease;
+}
+
+.starscream-guide .button:hover,
+.starscream-guide .button:focus {
+  background: #eef7fb;
+  border-color: rgba(15, 109, 140, 0.2);
+  color: #0f6d8c;
+  outline: none;
+}
+
+.starscream-guide__rail {
+  position: sticky;
+  top: 32px;
+  display: grid;
+  gap: 16px;
+}
+
+.starscream-guide__rail-card {
+  padding: 22px;
+  border-radius: 22px;
+  background: var(--guide-surface-strong);
+  color: #f8fafc;
+  box-shadow: 0 28px 50px -34px rgba(15, 23, 42, 0.5);
+}
+
+.starscream-guide__eyebrow {
+  margin: 0 0 0.65rem;
+  font-size: 0.76rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.starscream-guide__rail-card h1,
+.starscream-guide__rail-card p {
+  color: inherit;
+}
+
+.starscream-guide__rail-card h1 {
+  margin: 0 0 0.75rem;
+  font-size: 1.9rem;
+  line-height: 1.05;
+}
+
+.starscream-guide__rail-card p {
+  margin: 0;
+  color: rgba(248, 250, 252, 0.84);
+}
+
+.starscream-guide__toc {
+  display: grid;
+  gap: 8px;
+  padding: 14px;
+  border: 1px solid var(--guide-border);
+  border-radius: 18px;
+  background: var(--guide-surface);
+}
+
+.starscream-guide__toc a {
+  display: block;
+  padding: 10px 12px;
+  border-radius: 12px;
+  color: var(--guide-ink);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.starscream-guide__toc a:hover,
+.starscream-guide__toc a:focus {
+  background: #eef7fb;
+  color: #0f6d8c;
+}
+
+.starscream-guide__main {
+  display: grid;
+  gap: 24px;
+}
+
+.starscream-guide-hero,
+.starscream-guide-section {
+  scroll-margin-top: 28px;
+  border: 1px solid var(--guide-border);
+  border-radius: 24px;
+  background: var(--guide-surface);
+  box-shadow: 0 24px 50px -40px rgba(15, 23, 42, 0.35);
+}
+
+.starscream-guide-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(280px, 0.85fr);
+  gap: 24px;
+  padding: 28px;
+  background:
+    radial-gradient(circle at top right, rgba(60, 167, 196, 0.16), transparent 34%),
+    linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
+}
+
+.starscream-guide-hero__copy h2 {
+  margin: 0 0 0.85rem;
+  font-size: clamp(1.8rem, 3vw, 2.5rem);
+  line-height: 1.05;
+}
+
+.starscream-guide-hero__copy p:last-child {
+  margin-bottom: 0;
+}
+
+.starscream-guide-hero__meta {
+  display: grid;
+  gap: 14px;
+}
+
+.starscream-guide-stat {
+  padding: 16px 18px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.86);
+  border: 1px solid rgba(15, 23, 42, 0.08);
+}
+
+.starscream-guide-stat strong,
+.starscream-guide-step strong {
+  display: block;
+  margin-bottom: 0.35rem;
+  color: var(--guide-ink);
+}
+
+.starscream-guide-stat span,
+.starscream-guide-step p,
+.starscream-guide-section__head p {
+  color: var(--guide-muted);
+}
+
+.starscream-guide-section {
+  padding: 24px;
+}
+
+.starscream-guide-section__head {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 12px 24px;
+  margin-bottom: 18px;
+}
+
+.starscream-guide-section__head h2 {
+  margin: 0 0 0.45rem;
+  font-size: 1.55rem;
+}
+
+.starscream-guide-section__head p {
+  max-width: 70ch;
+  margin: 0;
+}
+
+.starscream-guide-section__note {
+  max-width: 32ch;
+  padding: 12px 14px;
+  border-radius: 14px;
+  background: #f8fbff;
+  border: 1px solid rgba(15, 109, 140, 0.12);
+  font-size: 0.95rem;
+}
+
+.starscream-guide-steps {
+  display: grid;
+  gap: 14px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.starscream-guide-step {
+  padding: 18px;
+  border-radius: 18px;
+  background: var(--guide-surface-soft);
+  border: 1px solid rgba(15, 23, 42, 0.08);
+}
+
+.starscream-guide-step p {
+  margin: 0;
+}
+
+.starscream-guide-table-wrap {
+  overflow-x: auto;
+}
+
+.starscream-guide-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.starscream-guide-table thead th {
+  background: #f8fbff;
+  text-align: left;
+}
+
+.starscream-guide-table th,
+.starscream-guide-table td {
+  padding: 14px 12px;
+  border-bottom: 1px solid rgba(15, 23, 42, 0.08);
+}
+
+.starscream-guide-table td code {
+  white-space: nowrap;
+}
+
+.starscream-guide-pattern {
+  display: grid;
+  gap: 18px;
+  grid-template-columns: minmax(0, 1.05fr) minmax(320px, 0.95fr);
+}
+
+.starscream-guide-pattern__panel {
+  min-width: 0;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  border-radius: 20px;
+  background: #ffffff;
+  overflow: hidden;
+}
+
+.starscream-guide-pattern__panel--preview {
+  background:
+    linear-gradient(180deg, #fbfdff 0%, #f2f7fb 100%);
+}
+
+.starscream-guide-preview {
+  padding: 20px;
+}
+
+.starscream-guide-preview .site-page-intro {
+  margin-bottom: 0;
+}
+
+.starscream-guide-split {
+  display: grid;
+  gap: var(--site-grid-gap);
+  align-items: center;
+}
+
+.starscream-guide-placeholder {
+  display: grid;
+  place-items: center;
+  min-height: 240px;
+  padding: 24px;
+  background:
+    linear-gradient(135deg, rgba(15, 109, 140, 0.16), rgba(8, 59, 82, 0.08));
+  color: #0b3042;
+  font-size: 1.1rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+.starscream-guide-outline {
+  display: grid;
+  gap: 12px;
+}
+
+.starscream-guide-outline__item {
+  padding: 14px 16px;
+  border-radius: 14px;
+  background: #eef7fb;
+  border: 1px solid rgba(15, 109, 140, 0.14);
+  color: #0b3042;
+  font-weight: 600;
+}
+
+.starscream-guide-code__bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 16px 18px 0;
+}
+
+.starscream-guide-code {
+  display: block;
+  width: calc(100% - 32px);
+  min-height: 280px;
+  margin: 14px 16px 16px;
+  padding: 16px;
+  border: 1px solid rgba(15, 23, 42, 0.12);
+  border-radius: 16px;
+  background: #0f172a;
+  color: #e2e8f0;
+  font: 13px/1.55 SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace;
+  resize: vertical;
+}
+
+.starscream-guide-code:focus {
+  outline: 2px solid rgba(15, 109, 140, 0.2);
+  border-color: rgba(15, 109, 140, 0.3);
+  box-shadow: none;
+}
+
+@media (min-width: 1024px) {
+  .starscream-guide-split {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 1180px) {
+  .starscream-guide {
+    grid-template-columns: 1fr;
+  }
+
+  .starscream-guide__rail {
+    position: static;
+  }
+}
+
+@media (max-width: 1023px) {
+  .starscream-guide-hero,
+  .starscream-guide-pattern,
+  .starscream-guide-steps {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 782px) {
+  .starscream-guide-page {
+    margin-right: 12px;
+  }
+
+  .starscream-guide-hero,
+  .starscream-guide-section,
+  .starscream-guide__rail-card {
+    padding: 20px;
+  }
+
+  .starscream-guide-preview {
+    padding: 14px;
+  }
+
+  .starscream-guide-code {
+    width: calc(100% - 24px);
+    margin: 12px;
+  }
+
+  .starscream-guide-code__bar {
+    padding: 14px 12px 0;
+  }
+}

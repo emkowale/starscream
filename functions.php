@@ -42,6 +42,7 @@ starscream_require('inc/media/webp.php');
 
 /** Enqueues & CSS vars */
 starscream_require('inc/enqueue/styles.php');
+starscream_require('inc/enqueue/site-system.php');
 starscream_require('inc/enqueue/gallery.php');
 starscream_require('inc/enqueue/vars.php');
 
@@ -61,6 +62,7 @@ starscream_require('inc/woo/store-setup.php');
 
 /** Updater (GitHub “latest” + codeload fallback; dynamic slug) */
 starscream_require('inc/admin/theme-updater.php');
+starscream_require('inc/admin/page-builder-guide.php');
 
 // Add-only: nav formatting & toggle (no color changes)
 starscream_require('inc/enqueue/nav-lite.php');

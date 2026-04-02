@@ -80,6 +80,23 @@ document.addEventListener('DOMContentLoaded', function () {
     return null;
   };
 
+  var normalizeMenuHref = function (href) {
+    var normalized = (href || '').trim();
+    if (!normalized) return '';
+
+    try {
+      var url = new URL(normalized, window.location.origin);
+      var pathname = url.pathname.replace(/\/+$/, '');
+      return (url.origin + (pathname || '/')).toLowerCase();
+    } catch (error) {
+      return normalized.replace(/\/+$/, '').toLowerCase();
+    }
+  };
+
+  var normalizeMenuLabel = function (label) {
+    return (label || '').replace(/\s+/g, ' ').trim().toLowerCase();
+  };
+
   var buildMobileMenuMeta = function () {
     if (!nav) return;
     var menu = nav.querySelector('.menu');
@@ -151,6 +168,54 @@ document.addEventListener('DOMContentLoaded', function () {
 
     metaItem.appendChild(list);
     menu.appendChild(metaItem);
+  };
+
+  var hydrateMenuLabels = function () {
+    if (!nav) return;
+    var links = nav.querySelectorAll('.menu > li > a, .sub-menu a');
+    links.forEach(function (link) {
+      var label = (link.textContent || '').replace(/\s+/g, ' ').trim();
+      if (!label) return;
+      link.setAttribute('data-menu-label', label);
+    });
+  };
+
+  var dedupeMobileSubmenuItems = function () {
+    if (!nav) return;
+
+    var parents = nav.querySelectorAll('li.menu-item-has-children');
+    parents.forEach(function (parent) {
+      var parentLink = getDirectLink(parent);
+      var submenu = getDirectChildByClass(parent, 'sub-menu');
+      var parentHref;
+      var parentLabel;
+
+      if (!parentLink || !submenu) return;
+
+      parentHref = normalizeMenuHref(parentLink.getAttribute('href'));
+      parentLabel = normalizeMenuLabel(parentLink.textContent);
+
+      Array.prototype.forEach.call(submenu.children, function (child) {
+        var childLink;
+        var childHref;
+        var childLabel;
+
+        if (!child || child.tagName !== 'LI') return;
+        child.classList.remove('btx-mobile-duplicate-link');
+
+        childLink = getDirectLink(child);
+        if (!childLink) return;
+
+        childHref = normalizeMenuHref(childLink.getAttribute('href'));
+        childLabel = normalizeMenuLabel(childLink.textContent);
+
+        if (!parentHref || !parentLabel) return;
+        if (childHref !== parentHref) return;
+        if (childLabel !== parentLabel) return;
+
+        child.classList.add('btx-mobile-duplicate-link');
+      });
+    });
   };
 
   var closeAllMobileSubmenus = function () {
@@ -247,6 +312,8 @@ document.addEventListener('DOMContentLoaded', function () {
   if (!nav.id) nav.id = 'primary-menu';
   buildMobileSubmenuToggles();
   buildMobileMenuMeta();
+  hydrateMenuLabels();
+  dedupeMobileSubmenuItems();
 
   // If header is present, create a hamburger before nav; otherwise leave nav as-is.
   if (headerBar) {
@@ -288,6 +355,7 @@ document.addEventListener('DOMContentLoaded', function () {
   window.addEventListener('resize', function () {
     if (!mobileQuery.matches) setMobileMenuOpen(false);
     buildMobileMenuMeta();
+    dedupeMobileSubmenuItems();
   });
 
   recalcLayoutVars();

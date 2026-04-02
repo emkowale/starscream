@@ -75,7 +75,7 @@ add_action('customize_register', function ($wp_customize) {
   ]);
   $wp_customize->add_control('tbt_google_reviews_business_location', [
     'label' => 'Business Location',
-    'description' => 'Example: "Uniform Headquarters, 2705 N Saginaw Rd, Midland, MI".',
+    'description' => 'Enter the exact Google business name and street address. Example: "La Estrella Del Norte Bakery, 2406 N Michigan Ave, Saginaw, MI 48602".',
     'section' => $section,
     'type' => 'text',
     'priority' => 21,
@@ -87,7 +87,7 @@ add_action('customize_register', function ($wp_customize) {
   ]);
   $wp_customize->add_control('tbt_google_reviews_place_id', [
     'label' => 'Place ID (Optional)',
-    'description' => 'Optional override. If set, this is used instead of Business Location lookup. <a href="https://developers.google.com/maps/documentation/javascript/examples/places-placeid-finder" target="_blank" rel="noopener noreferrer">Open Place ID Finder</a>.',
+    'description' => 'Optional hard override. If set, this exact Google place is used and Business Location lookup is skipped. Use it when Google matches the wrong business. <a href="https://developers.google.com/maps/documentation/javascript/examples/places-placeid-finder" target="_blank" rel="noopener noreferrer">Open Place ID Finder</a>.',
     'section' => $section,
     'type' => 'text',
     'priority' => 22,

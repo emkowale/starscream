@@ -4,12 +4,13 @@
   top: calc(var(--btx-admin-offset, 0px) + var(--btx-header-top-offset, 0px));
   left: 0;
   right: 0;
-  z-index: 1000;
+  z-index: 3500;
   padding: 10px 20px;
   color: var(--header-text-color);
   font-family: var(--header-footer-font);
   background-color: var(--header-bg-color);
   border-bottom: 1px solid var(--header-bg-color);
+  overflow: visible;
 }
 
 /* Home page (and header-slider home-like pages) when enabled: transparent header + wipe-down fill */
@@ -17,7 +18,7 @@ body.btx-transparent-header-enabled.home .btx-site-header,
 body.btx-transparent-header-enabled.btx-has-header-slider .btx-site-header {
   background-color: transparent;
   isolation: isolate;
-  overflow: hidden;
+  overflow: visible;
 }
 
 body.btx-transparent-header-enabled.home .btx-site-header::before,
@@ -27,13 +28,14 @@ body.btx-transparent-header-enabled.btx-has-header-slider .btx-site-header::befo
   inset: 0;
   z-index: -1;
   background-color: var(--header-bg-color);
-  transform: translateY(-100%);
+  transform: scaleY(0);
+  transform-origin: top center;
   transition: transform 250ms cubic-bezier(0.104, 0.204, 0.492, 1);
 }
 
 body.btx-transparent-header-enabled.home .btx-site-header.is-scrolled::before,
 body.btx-transparent-header-enabled.btx-has-header-slider .btx-site-header.is-scrolled::before {
-  transform: translateY(0);
+  transform: scaleY(1);
 }
 
 @media (prefers-reduced-motion: reduce) {

@@ -59,7 +59,7 @@ if ( is_front_page() || is_home() || ( function_exists('is_shop') && is_shop() )
         $icon = get_theme_mod("social_icon_$i");
         $url  = get_theme_mod("social_url_$i");
         if (!empty($icon) && !empty($url)) : ?>
-          <a href="<?php echo esc_url($url); ?>" target="_blank" rel="noopener" style="color: var(--accent-color);">
+          <a class="bt-footer-social-link" href="<?php echo esc_url($url); ?>" target="_blank" rel="noopener">
             <i class="<?php echo esc_attr($icon); ?>"></i>
           </a>
         <?php endif;

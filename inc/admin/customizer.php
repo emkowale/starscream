@@ -41,6 +41,7 @@ foreach ([
   'inc/admin/customizer/contact_hero.php',
   'inc/admin/customizer/slider.php',
   'inc/admin/customizer/google_reviews.php',
+  'inc/admin/customizer/ai_page_builder.php',
   'inc/admin/customizer/banners.php',
   'inc/admin/customizer/socials.php',
 ] as $rel) { starscream_customizer_require($rel); }
@@ -77,6 +78,7 @@ $parts = [
   'inc/admin/customizer/contact_hero.php', // phone, email, hero video
   'inc/admin/customizer/slider.php',       // tbt slider ticker + video url
   'inc/admin/customizer/google_reviews.php', // tbt googlereviews shortcode data source
+  'inc/admin/customizer/ai_page_builder.php', // AI page builder
   'inc/admin/customizer/banners.php',      // header/footer banner media, link, alt
   'inc/admin/customizer/socials.php',      // social icon + url slots
 ];

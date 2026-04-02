@@ -68,17 +68,3 @@ add_filter('woocommerce_product_get_attributes', function ($attributes) {
     }
     return $attributes;
 }, 99, 2);
-
-// Defense-in-depth CSS in case a template bypasses filters or cache serves old HTML
-add_action('wp_head', function () {
-    echo '<style id="starscream-hide-quality">
-    .woocommerce td.product-name dl.variation dt[class*="variation-Quality"],
-    .woocommerce td.product-name dl.variation dd[class*="variation-Quality"],
-    .woocommerce td.product-name dl.variation dt[class*="variation-quality"],
-    .woocommerce td.product-name dl.variation dd[class*="variation-quality"],
-    .woocommerce-mini-cart-item dl.variation dt[class*="variation-Quality"],
-    .woocommerce-mini-cart-item dl.variation dd[class*="variation-Quality"],
-    .woocommerce-mini-cart-item dl.variation dt[class*="variation-quality"],
-    .woocommerce-mini-cart-item dl.variation dd[class*="variation-quality"]{display:none !important;}
-    </style>';
-}, 99);

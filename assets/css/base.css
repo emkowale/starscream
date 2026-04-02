@@ -63,3 +63,13 @@ header .woocommerce-breadcrumb, .product_meta, #secondary { display:none !import
 html, body { overflow-x:hidden; }
 body { margin:0; }
 #primary { margin:0 10px 10px; }
+
+/* Hide Quality variation rows in cart/mini-cart fallback markup */
+.woocommerce td.product-name dl.variation dt[class*="variation-Quality"],
+.woocommerce td.product-name dl.variation dd[class*="variation-Quality"],
+.woocommerce td.product-name dl.variation dt[class*="variation-quality"],
+.woocommerce td.product-name dl.variation dd[class*="variation-quality"],
+.woocommerce-mini-cart-item dl.variation dt[class*="variation-Quality"],
+.woocommerce-mini-cart-item dl.variation dd[class*="variation-Quality"],
+.woocommerce-mini-cart-item dl.variation dt[class*="variation-quality"],
+.woocommerce-mini-cart-item dl.variation dd[class*="variation-quality"]{ display:none !important; }
