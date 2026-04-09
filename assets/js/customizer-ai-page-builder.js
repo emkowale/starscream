@@ -174,6 +174,7 @@
     $modal.prop('hidden', !isBusy);
     $root.find('.starscream-ai-page-builder__build').prop('disabled', isBusy);
     $root.find('.starscream-ai-page-builder__suggest-replacements').prop('disabled', isBusy);
+    $root.find('.starscream-ai-page-builder__fix-media-library').prop('disabled', isBusy);
     $root.find('.starscream-ai-page-builder__apply-replacements').prop('disabled', isBusy || !$root.find('.starscream-ai-page-builder__replacements-json').val());
   }
 
@@ -209,10 +210,33 @@
     showNotice($root.find('.starscream-ai-page-builder__replace-result'), type, html);
   }
 
+  function showFixResult($root, type, html) {
+    showNotice($root.find('.starscream-ai-page-builder__fix-result'), type, html);
+  }
+
   function clearSuggestions($root) {
     $root.find('.starscream-ai-page-builder__replacements-json').val('');
     $root.find('.starscream-ai-page-builder__suggestions').empty().prop('hidden', true);
     $root.find('.starscream-ai-page-builder__apply-replacements').prop('hidden', true).prop('disabled', true);
+  }
+
+  function showFixSuccess($root, totals) {
+    var parts = [];
+
+    parts.push('<p><strong>Media library fixer finished.</strong></p>');
+    parts.push('<ul class="starscream-ai-page-builder__fix-summary">');
+    parts.push('<li>Processed ' + escapeHtml(totals.processed || 0) + ' attachments.</li>');
+    parts.push('<li>Updated ' + escapeHtml(totals.updated || 0) + ' oversized images.</li>');
+    parts.push('<li>Updated ' + escapeHtml(totals.updated_mockups || 0) + ' Bumblebee mockups.</li>');
+    parts.push('<li>Left ' + escapeHtml(totals.unchanged || 0) + ' already within the standard.</li>');
+    parts.push('<li>Skipped ' + escapeHtml(totals.skipped_original_art || 0) + ' Bumblebee original art attachments.</li>');
+    parts.push('<li>Skipped ' + escapeHtml(totals.skipped_unsupported || 0) + ' unsupported images.</li>');
+    if (Number(totals.errors || 0) > 0) {
+      parts.push('<li>' + escapeHtml(totals.errors) + ' attachments could not be processed.</li>');
+    }
+    parts.push('</ul>');
+
+    showFixResult($root, 'success', parts.join(''));
   }
 
   function renderSuggestionCards($root, suggestions) {
@@ -606,6 +630,81 @@
           showReplaceResult($root, 'error', '<p>The request failed before the page images could be updated.</p>');
         }).finally(function () {
           stopBusy($root, intervalId);
+        });
+      });
+
+      $root.on('click', '.starscream-ai-page-builder__fix-media-library', function (event) {
+        var intervalId;
+        var totals;
+
+        event.preventDefault();
+
+        if (!window.confirm(messages.fixConfirm)) {
+          return;
+        }
+
+        totals = {
+          processed: 0,
+          updated: 0,
+          updated_mockups: 0,
+          unchanged: 0,
+          skipped_original_art: 0,
+          skipped_unsupported: 0,
+          errors: 0
+        };
+
+        clearNotice($root.find('.starscream-ai-page-builder__fix-result'));
+        intervalId = startBusy($root, 'Media library fixer is working...', messages.fixing);
+
+        function runBatch(cursor) {
+          var payload = new URLSearchParams();
+
+          payload.set('action', 'starscream_ai_page_builder_fix_media_library');
+          payload.set('nonce', config.nonce);
+          payload.set('cursor', String(cursor || 0));
+
+          return fetch(config.ajaxUrl, {
+            method: 'POST',
+            credentials: 'same-origin',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8' },
+            body: payload.toString()
+          }).then(function (response) {
+            return response.json();
+          }).then(function (json) {
+            var data;
+            var counts;
+
+            if (!json || !json.success) {
+              var message = json && json.data && json.data.message ? json.data.message : 'The media library fixer failed.';
+              throw new Error(message);
+            }
+
+            data = json.data || {};
+            counts = data.counts || {};
+
+            totals.processed += Number(counts.processed || 0);
+            totals.updated += Number(counts.updated || 0);
+            totals.updated_mockups += Number(counts.updated_mockups || 0);
+            totals.unchanged += Number(counts.unchanged || 0);
+            totals.skipped_original_art += Number(counts.skipped_original_art || 0);
+            totals.skipped_unsupported += Number(counts.skipped_unsupported || 0);
+            totals.errors += Number(counts.errors || 0);
+
+            updateStatus($root, 'Scanned ' + totals.processed + ' attachments. Updated ' + totals.updated + ' so far.');
+
+            if (data.done) {
+              showFixSuccess($root, totals);
+              stopBusy($root, intervalId);
+              return;
+            }
+
+            return runBatch(Number(data.next_cursor || cursor || 0));
+          });
+        }
+
+        runBatch(0).catch(function (error) {
+          stopBusy($root, intervalId);
+          showFixResult($root, 'error', '<p>' + escapeHtml(error && error.message ? error.message : 'The media library fixer failed before it could finish.') + '</p>');
         });
       });
     });

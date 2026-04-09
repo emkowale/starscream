@@ -14,6 +14,28 @@ if (!function_exists('starscream_google_reviews_clean_text')) {
   }
 }
 
+if (!function_exists('starscream_google_reviews_api_error_message')) {
+  function starscream_google_reviews_api_error_message($prefix, $status, $message = '') {
+    $status = strtoupper(trim((string) $status));
+    $message = starscream_google_reviews_clean_text((string) $message, 240);
+    $detail = $message !== '' ? $message : $status;
+    $hint = '';
+
+    $normalized = strtolower($message);
+    if (
+      $status === 'REQUEST_DENIED'
+      || strpos($normalized, 'api key') !== false
+      || strpos($normalized, 'referer restrictions') !== false
+      || strpos($normalized, 'not authorized') !== false
+      || strpos($normalized, 'invalid') !== false
+    ) {
+      $hint = ' This theme calls Google Places from PHP on the server, so browser referrer restricted keys usually fail here. Use a server-capable key, and make sure both Places API and Places API (New) are enabled for the same project.';
+    }
+
+    return trim($prefix . ': ' . $detail . '.' . $hint);
+  }
+}
+
 if (!function_exists('starscream_google_reviews_request_json')) {
   function starscream_google_reviews_request_json($url) {
     $response = wp_remote_get($url, [
@@ -56,11 +78,14 @@ if (!function_exists('starscream_google_reviews_resolve_place')) {
 
     $status = strtoupper((string) ($json['status'] ?? ''));
     if ($status !== 'OK') {
-      $message = starscream_google_reviews_clean_text((string) ($json['error_message'] ?? ''), 240);
       if ($status === 'ZERO_RESULTS') {
         return new WP_Error('google_reviews_no_place', 'Google place not found for the configured business location.');
       }
-      return new WP_Error('google_reviews_find_status', 'Google Find Place failed: ' . ($message !== '' ? $message : $status));
+      return new WP_Error('google_reviews_find_status', starscream_google_reviews_api_error_message(
+        'Google Find Place failed',
+        $status,
+        (string) ($json['error_message'] ?? '')
+      ));
     }
 
     $candidate = $json['candidates'][0] ?? null;
@@ -97,8 +122,11 @@ if (!function_exists('starscream_google_reviews_fetch_place_details')) {
 
     $status = strtoupper((string) ($json['status'] ?? ''));
     if ($status !== 'OK') {
-      $message = starscream_google_reviews_clean_text((string) ($json['error_message'] ?? ''), 240);
-      return new WP_Error('google_reviews_details_status', 'Google Place Details failed: ' . ($message !== '' ? $message : $status));
+      return new WP_Error('google_reviews_details_status', starscream_google_reviews_api_error_message(
+        'Google Place Details failed',
+        $status,
+        (string) ($json['error_message'] ?? '')
+      ));
     }
 
     if (!isset($json['result']) || !is_array($json['result'])) {
@@ -139,8 +167,11 @@ if (!function_exists('starscream_google_reviews_fetch_place_details_new_api')) {
     }
 
     if (isset($json['error']) && is_array($json['error'])) {
-      $message = starscream_google_reviews_clean_text((string) ($json['error']['message'] ?? ''), 240);
-      return new WP_Error('google_reviews_new_error', 'Google Places API (new) error: ' . ($message !== '' ? $message : 'Unknown error'));
+      return new WP_Error('google_reviews_new_error', starscream_google_reviews_api_error_message(
+        'Google Places API (new) error',
+        (string) ($json['error']['status'] ?? ''),
+        (string) ($json['error']['message'] ?? '')
+      ));
     }
 
     $raw_reviews = isset($json['reviews']) && is_array($json['reviews']) ? $json['reviews'] : [];

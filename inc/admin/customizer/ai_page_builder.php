@@ -11,7 +11,7 @@ if (!function_exists('starscream_sanitize_ai_page_builder_model')) {
   function starscream_sanitize_ai_page_builder_model($value) {
     $value = trim((string) sanitize_text_field((string) $value));
     $value = preg_replace('/[^A-Za-z0-9._:-]/', '', $value);
-    if (!is_string($value) || $value === '') return 'gpt-4.1';
+    if (!is_string($value) || $value === '') return 'gpt-5.1';
     return substr($value, 0, 100);
   }
 }
@@ -35,10 +35,10 @@ if (!function_exists('starscream_ai_page_builder_model')) {
     $override = trim((string) $override);
     if ($override !== '') return starscream_sanitize_ai_page_builder_model($override);
 
-    $stored = trim((string) get_theme_mod('starscream_ai_page_builder_model', 'gpt-4.1'));
+    $stored = trim((string) get_theme_mod('starscream_ai_page_builder_model', 'gpt-5.1'));
     if ($stored !== '') return starscream_sanitize_ai_page_builder_model($stored);
 
-    return 'gpt-4.1';
+    return 'gpt-5.1';
   }
 }
 
@@ -169,6 +169,31 @@ if (class_exists('WP_Customize_Control') && !class_exists('Starscream_Customize_
         <div class="starscream-ai-page-builder__replace-result" aria-live="polite"></div>
         <div class="starscream-ai-page-builder__suggestions" hidden></div>
 
+        <div class="starscream-ai-page-builder__tool-divider" role="separator" aria-label="Media Library Fixer">
+          <span>Media Library Fixer</span>
+        </div>
+
+        <p class="description">
+          Resize oversized media-library images to the site standard for Starscream pages. Bumblebee original art is skipped, while Bumblebee mockups are capped separately for ecommerce use.
+        </p>
+
+        <div class="starscream-ai-page-builder__field">
+          <span class="starscream-ai-page-builder__label">Standards</span>
+          <div class="starscream-ai-page-builder__standards">
+            <span><strong>Landscape:</strong> 2560 x 2048 max</span>
+            <span><strong>Portrait:</strong> 2048 x 2560 max</span>
+            <span><strong>Square:</strong> 2000 x 2000 max</span>
+            <span><strong>Bumblebee mockups:</strong> 500 x 500 max</span>
+            <span><strong>Bumblebee original art:</strong> never modified</span>
+          </div>
+        </div>
+
+        <div class="starscream-ai-page-builder__field starscream-ai-page-builder__field--actions">
+          <button type="button" class="button starscream-ai-page-builder__fix-media-library">Fix media library images</button>
+        </div>
+
+        <div class="starscream-ai-page-builder__fix-result" aria-live="polite"></div>
+
         <div class="starscream-ai-page-builder__modal" hidden>
           <div class="starscream-ai-page-builder__modal-card">
             <span class="spinner is-active"></span>
@@ -276,6 +301,300 @@ if (!function_exists('starscream_ai_page_builder_attachment_meta')) {
       'width' => $width,
       'height' => $height,
       'orientation' => $orientation,
+    ];
+  }
+}
+
+if (!function_exists('starscream_ai_page_builder_media_fix_standards')) {
+  function starscream_ai_page_builder_media_fix_standards() {
+    return [
+      'landscape' => [
+        'label' => 'Landscape',
+        'max_width' => 2560,
+        'max_height' => 2048,
+      ],
+      'portrait' => [
+        'label' => 'Portrait',
+        'max_width' => 2048,
+        'max_height' => 2560,
+      ],
+      'square' => [
+        'label' => 'Square',
+        'max_width' => 2000,
+        'max_height' => 2000,
+      ],
+      'bumblebee_mockup' => [
+        'label' => 'Bumblebee mockup',
+        'max_width' => 500,
+        'max_height' => 500,
+      ],
+    ];
+  }
+}
+
+if (!function_exists('starscream_ai_page_builder_orientation_for_dimensions')) {
+  function starscream_ai_page_builder_orientation_for_dimensions($width, $height) {
+    $width = (int) $width;
+    $height = (int) $height;
+    if ($width < 1 || $height < 1) return 'square';
+
+    $ratio = $width / $height;
+    if (abs($ratio - 1) <= 0.08) return 'square';
+
+    return $ratio > 1 ? 'landscape' : 'portrait';
+  }
+}
+
+if (!function_exists('starscream_ai_page_builder_bumblebee_original_art_ids')) {
+  function starscream_ai_page_builder_bumblebee_original_art_ids() {
+    static $ids = null;
+    if (is_array($ids)) return $ids;
+
+    global $wpdb;
+
+    $ids = [];
+    $meta_rows = $wpdb->get_results(
+      "SELECT meta_key, meta_value FROM {$wpdb->postmeta} WHERE meta_key LIKE 'Original Art %'",
+      ARRAY_A
+    );
+
+    foreach ((array) $meta_rows as $row) {
+      $meta_key = isset($row['meta_key']) ? (string) $row['meta_key'] : '';
+      $meta_value = isset($row['meta_value']) ? trim((string) $row['meta_value']) : '';
+      if ($meta_value === '') continue;
+
+      if (strpos($meta_key, 'Original Art ID ') === 0) {
+        $attachment_id = absint($meta_value);
+        if ($attachment_id > 0) $ids[$attachment_id] = true;
+        continue;
+      }
+
+      $attachment_id = starscream_ai_page_builder_attachment_id_from_url($meta_value);
+      if ($attachment_id > 0) $ids[$attachment_id] = true;
+    }
+
+    return $ids;
+  }
+}
+
+if (!function_exists('starscream_ai_page_builder_bumblebee_mockup_attachment_ids')) {
+  function starscream_ai_page_builder_bumblebee_mockup_attachment_ids() {
+    static $ids = null;
+    if (is_array($ids)) return $ids;
+
+    global $wpdb;
+
+    $ids = [];
+    $product_ids = $wpdb->get_col(
+      "SELECT DISTINCT post_id FROM {$wpdb->postmeta} WHERE meta_key IN ('Site Slug', 'Company Name', 'Production')"
+    );
+
+    $product_ids = array_values(array_filter(array_map('absint', (array) $product_ids)));
+    if (empty($product_ids)) return $ids;
+
+    $parent_ids_sql = implode(',', $product_ids);
+    $variation_ids = $wpdb->get_col(
+      "SELECT ID FROM {$wpdb->posts} WHERE post_type = 'product_variation' AND post_parent IN ({$parent_ids_sql})"
+    );
+
+    $post_ids = array_values(array_unique(array_filter(array_merge($product_ids, array_map('absint', (array) $variation_ids)))));
+    if (empty($post_ids)) return $ids;
+
+    $post_ids_sql = implode(',', $post_ids);
+    $thumb_rows = $wpdb->get_col(
+      "SELECT meta_value FROM {$wpdb->postmeta} WHERE meta_key = '_thumbnail_id' AND post_id IN ({$post_ids_sql})"
+    );
+
+    foreach ((array) $thumb_rows as $thumb_id) {
+      $attachment_id = absint($thumb_id);
+      if ($attachment_id > 0) $ids[$attachment_id] = true;
+    }
+
+    return $ids;
+  }
+}
+
+if (!function_exists('starscream_ai_page_builder_media_fix_profile_for_attachment')) {
+  function starscream_ai_page_builder_media_fix_profile_for_attachment($attachment_id, $width, $height) {
+    $attachment_id = absint($attachment_id);
+    $original_art_ids = starscream_ai_page_builder_bumblebee_original_art_ids();
+    if ($attachment_id > 0 && isset($original_art_ids[$attachment_id])) {
+      return [
+        'skip' => true,
+        'reason' => 'bumblebee_original_art',
+      ];
+    }
+
+    $orientation = starscream_ai_page_builder_orientation_for_dimensions($width, $height);
+    $profile_key = $orientation;
+    $mockup_ids = starscream_ai_page_builder_bumblebee_mockup_attachment_ids();
+    if ($attachment_id > 0 && isset($mockup_ids[$attachment_id])) {
+      $profile_key = 'bumblebee_mockup';
+    }
+
+    $standards = starscream_ai_page_builder_media_fix_standards();
+    if (empty($standards[$profile_key])) {
+      return [
+        'skip' => true,
+        'reason' => 'unsupported_profile',
+      ];
+    }
+
+    return [
+      'skip' => false,
+      'profile_key' => $profile_key,
+      'profile' => $standards[$profile_key],
+      'orientation' => $orientation,
+    ];
+  }
+}
+
+if (!function_exists('starscream_ai_page_builder_fix_attachment')) {
+  function starscream_ai_page_builder_fix_attachment($attachment_id) {
+    $attachment_id = absint($attachment_id);
+    if ($attachment_id < 1) {
+      return ['status' => 'error', 'reason' => 'invalid_attachment'];
+    }
+
+    $mime = strtolower((string) get_post_mime_type($attachment_id));
+    if (!in_array($mime, ['image/jpeg', 'image/png', 'image/webp'], true)) {
+      return ['status' => 'skipped', 'reason' => 'unsupported_type'];
+    }
+
+    $file = (string) get_attached_file($attachment_id, true);
+    if ($file === '' || !file_exists($file)) {
+      return ['status' => 'error', 'reason' => 'missing_file'];
+    }
+
+    $size = @getimagesize($file);
+    if (!is_array($size) || empty($size[0]) || empty($size[1])) {
+      return ['status' => 'error', 'reason' => 'invalid_image'];
+    }
+
+    $width = (int) $size[0];
+    $height = (int) $size[1];
+    $profile = starscream_ai_page_builder_media_fix_profile_for_attachment($attachment_id, $width, $height);
+    if (!empty($profile['skip'])) {
+      return ['status' => 'skipped', 'reason' => (string) ($profile['reason'] ?? 'skipped')];
+    }
+
+    $profile_data = isset($profile['profile']) && is_array($profile['profile']) ? $profile['profile'] : [];
+    $max_width = isset($profile_data['max_width']) ? (int) $profile_data['max_width'] : 0;
+    $max_height = isset($profile_data['max_height']) ? (int) $profile_data['max_height'] : 0;
+    if ($max_width < 1 || $max_height < 1) {
+      return ['status' => 'error', 'reason' => 'invalid_profile'];
+    }
+
+    if ($width <= $max_width && $height <= $max_height) {
+      return [
+        'status' => 'unchanged',
+        'profile_key' => (string) ($profile['profile_key'] ?? ''),
+      ];
+    }
+
+    if (!function_exists('wp_get_image_editor')) {
+      require_once ABSPATH . 'wp-admin/includes/image.php';
+    }
+
+    $editor = wp_get_image_editor($file);
+    if (is_wp_error($editor)) {
+      return ['status' => 'error', 'reason' => 'editor_unavailable'];
+    }
+
+    $resized = $editor->resize($max_width, $max_height, false);
+    if (is_wp_error($resized)) {
+      return ['status' => 'error', 'reason' => 'resize_failed'];
+    }
+
+    $saved = $editor->save($file);
+    if (is_wp_error($saved)) {
+      return ['status' => 'error', 'reason' => 'save_failed'];
+    }
+
+    require_once ABSPATH . 'wp-admin/includes/image.php';
+    $metadata = wp_generate_attachment_metadata($attachment_id, $file);
+    if (!is_wp_error($metadata) && is_array($metadata) && !empty($metadata)) {
+      wp_update_attachment_metadata($attachment_id, $metadata);
+    }
+
+    clean_post_cache($attachment_id);
+
+    return [
+      'status' => 'updated',
+      'profile_key' => (string) ($profile['profile_key'] ?? ''),
+    ];
+  }
+}
+
+if (!function_exists('starscream_ai_page_builder_fix_media_library_batch')) {
+  function starscream_ai_page_builder_fix_media_library_batch($args) {
+    global $wpdb;
+
+    $cursor = isset($args['cursor']) ? absint($args['cursor']) : 0;
+    $batch_size = 20;
+
+    $attachment_ids = $wpdb->get_col($wpdb->prepare(
+      "SELECT ID FROM {$wpdb->posts}
+       WHERE post_type = 'attachment'
+         AND post_status = 'inherit'
+         AND post_mime_type LIKE 'image/%%'
+         AND ID > %d
+       ORDER BY ID ASC
+       LIMIT %d",
+      $cursor,
+      $batch_size
+    ));
+
+    $counts = [
+      'processed' => 0,
+      'updated' => 0,
+      'updated_mockups' => 0,
+      'unchanged' => 0,
+      'skipped_original_art' => 0,
+      'skipped_unsupported' => 0,
+      'errors' => 0,
+    ];
+
+    $next_cursor = $cursor;
+    foreach ((array) $attachment_ids as $attachment_id_raw) {
+      $attachment_id = absint($attachment_id_raw);
+      if ($attachment_id < 1) continue;
+
+      $counts['processed']++;
+      $next_cursor = $attachment_id;
+      $result = starscream_ai_page_builder_fix_attachment($attachment_id);
+      $status = isset($result['status']) ? (string) $result['status'] : 'error';
+      $reason = isset($result['reason']) ? (string) $result['reason'] : '';
+      $profile_key = isset($result['profile_key']) ? (string) $result['profile_key'] : '';
+
+      if ($status === 'updated') {
+        $counts['updated']++;
+        if ($profile_key === 'bumblebee_mockup') $counts['updated_mockups']++;
+        continue;
+      }
+
+      if ($status === 'unchanged') {
+        $counts['unchanged']++;
+        continue;
+      }
+
+      if ($status === 'skipped') {
+        if ($reason === 'bumblebee_original_art') {
+          $counts['skipped_original_art']++;
+        } else {
+          $counts['skipped_unsupported']++;
+        }
+        continue;
+      }
+
+      $counts['errors']++;
+    }
+
+    return [
+      'done' => empty($attachment_ids),
+      'next_cursor' => $next_cursor,
+      'counts' => $counts,
+      'standards' => starscream_ai_page_builder_media_fix_standards(),
     ];
   }
 }
@@ -631,6 +950,15 @@ if (!function_exists('starscream_ai_page_builder_trimmed_sources')) {
       $urls[$url] = $url;
     }
     return array_values($urls);
+  }
+}
+
+if (!function_exists('starscream_ai_page_builder_google_location_context')) {
+  function starscream_ai_page_builder_google_location_context() {
+    return [
+      'business_location' => trim((string) get_theme_mod('tbt_google_reviews_business_location', '')),
+      'place_id' => trim((string) get_theme_mod('tbt_google_reviews_place_id', '')),
+    ];
   }
 }
 
@@ -1392,6 +1720,7 @@ if (!function_exists('starscream_ai_page_builder_request_payload')) {
     $existing_page_context = isset($args['existing_page_context']) ? trim((string) $args['existing_page_context']) : '';
     $media_candidates = isset($args['media_candidates']) && is_array($args['media_candidates']) ? $args['media_candidates'] : [];
     $visual_candidates = starscream_ai_page_builder_visual_candidates($media_candidates);
+    $google_location = starscream_ai_page_builder_google_location_context();
 
     $candidate_summary = [];
     foreach ($media_candidates as $candidate) {
@@ -1421,6 +1750,8 @@ if (!function_exists('starscream_ai_page_builder_request_payload')) {
       'If facts are uncertain, stay generic instead of fabricating details.',
       'For an about-us page archetype, use a modern about page flow: intro hero, mission/story split, capabilities/support section, differentiators or proof, and a closing CTA.',
       'For a service or program page archetype, use a hero, what-it-is section, benefits/services grid, proof or FAQ-style support, and a CTA.',
+      'If the brief, existing page, web research, or stored business location provides a specific real-world address or showroom/store/office location, include a location/contact section.',
+      'When a precise physical location is confirmed, include exactly one embedded Google map in that location/contact section using a plain iframe src like https://www.google.com/maps?output=embed&q=... built from the best confirmed address. Do not use the JavaScript Maps API. Do not include a map if the location is vague or unconfirmed.',
       'Use one H1 only. Use H2/H3 for supporting sections. Keep the HTML production-ready.',
       'Use alt text that accurately describes the image in the context of the section where it appears.',
       'The page should harmonize with the active Starscream theme settings and existing design system rather than inventing a brand-new visual language.',
@@ -1433,6 +1764,8 @@ if (!function_exists('starscream_ai_page_builder_request_payload')) {
       'Site name: ' . $site_name,
       'Official website: ' . $site_url,
       'Existing page URL: ' . ($existing_page_url !== '' ? $existing_page_url : 'n/a'),
+      'Stored Google business location: ' . (!empty($google_location['business_location']) ? (string) $google_location['business_location'] : 'n/a'),
+      'Stored Google Place ID: ' . (!empty($google_location['place_id']) ? (string) $google_location['place_id'] : 'n/a'),
       'Client brief / raw content:' . "\n" . ($brief !== '' ? $brief : 'No brief supplied. Use the title, official website, and reputable web sources to infer the best structure and copy.'),
       'Existing page context:' . "\n" . ($existing_page_context !== '' ? $existing_page_context : 'None supplied.'),
       'Candidate images JSON:' . "\n" . wp_json_encode($candidate_summary, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES),
@@ -1485,6 +1818,7 @@ if (!function_exists('starscream_ai_page_builder_request_payload')) {
           'type' => 'web_search',
           'search_context_size' => 'high',
           'user_location' => [
+            'type' => 'approximate',
             'country' => 'US',
           ],
         ],
@@ -1691,12 +2025,12 @@ add_action('customize_register', function ($wp_customize) {
   ]);
 
   $wp_customize->add_setting('starscream_ai_page_builder_model', [
-    'default' => 'gpt-4.1',
+    'default' => 'gpt-5.1',
     'sanitize_callback' => 'starscream_sanitize_ai_page_builder_model',
   ]);
   $wp_customize->add_control('starscream_ai_page_builder_model', [
     'label' => 'OpenAI Model',
-    'description' => 'Default is gpt-4.1. Override this if your account uses a different Responses API model.',
+    'description' => 'Default is gpt-5.1. Change this only if you need a different Responses API model for your account or workflow.',
     'section' => $section,
     'type' => 'text',
     'priority' => 21,
@@ -1753,6 +2087,7 @@ add_action('customize_controls_enqueue_scripts', function () {
       'messages' => [
         'overwriteConfirm' => 'This will overwrite the selected page content. Continue?',
         'replaceConfirm' => 'This will update the selected page with the suggested media library images. Continue?',
+        'fixConfirm' => 'This will resize oversized media-library images to the site standard. Bumblebee original art will be skipped. Continue?',
         'missingExistingPage' => 'Choose the page you want to overwrite.',
         'missingNewTitle' => 'Enter a title for the new page.',
         'missingReplacePage' => 'Choose the page you want to scan for image replacements.',
@@ -1772,6 +2107,12 @@ add_action('customize_controls_enqueue_scripts', function () {
         'applying' => [
           'Replacing the selected page images.',
           'Writing the updated page content back into WordPress.',
+        ],
+        'fixing' => [
+          'Scanning the media library for oversized images.',
+          'Skipping protected Bumblebee original art.',
+          'Resizing standard images to the site caps.',
+          'Refreshing WordPress image metadata.',
         ],
       ],
     ]);
@@ -1816,6 +2157,21 @@ add_action('wp_ajax_starscream_ai_page_builder_apply_replacements', function () 
   check_ajax_referer('starscream_ai_page_builder_nonce', 'nonce');
 
   $result = starscream_ai_page_builder_apply_page_replacements($_POST);
+  if (is_wp_error($result)) {
+    wp_send_json_error(['message' => $result->get_error_message()], 400);
+  }
+
+  wp_send_json_success($result);
+});
+
+add_action('wp_ajax_starscream_ai_page_builder_fix_media_library', function () {
+  if (!current_user_can('edit_theme_options')) {
+    wp_send_json_error(['message' => 'Insufficient permissions.'], 403);
+  }
+
+  check_ajax_referer('starscream_ai_page_builder_nonce', 'nonce');
+
+  $result = starscream_ai_page_builder_fix_media_library_batch($_POST);
   if (is_wp_error($result)) {
     wp_send_json_error(['message' => $result->get_error_message()], 400);
   }

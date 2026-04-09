@@ -23,6 +23,15 @@ add_action('wp_enqueue_scripts', function () {
   }
   wp_enqueue_style('starscream-woo-typ', starscream_asset_uri('assets/css/woocommerce-typography.css'), [], $v);
   wp_enqueue_style('starscream-buttons', starscream_asset_uri('assets/css/buttons.css'), [], $v);
+  $forms_path = function_exists('starscream_locate') ? starscream_locate('assets/css/forms.css') : '';
+  if ($forms_path && file_exists($forms_path)) {
+    wp_enqueue_style(
+      'starscream-forms',
+      starscream_asset_uri('assets/css/forms.css'),
+      ['starscream-buttons'],
+      filemtime($forms_path)
+    );
+  }
   wp_enqueue_style('starscream-checkout',starscream_asset_uri('assets/css/checkout.css'),['starscream-buttons'], $v);
   wp_enqueue_style('starscream-mobile',  starscream_asset_uri('assets/css/mobile-shop.css'), [], $v);
   wp_enqueue_style('starscream-logo',    starscream_asset_uri('assets/css/logo.css'),    [], $v);

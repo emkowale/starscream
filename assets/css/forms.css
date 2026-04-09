@@ -1,0 +1,221 @@
+/*
+ * Ninja Forms styling aligned to the Starscream page/card system.
+ */
+
+.nf-form-cont {
+  --site-form-radius: var(--site-radius-md, 18px);
+  --site-form-radius-sm: var(--site-radius-sm, 12px);
+  --site-form-border: var(--site-border-color, rgba(15, 23, 42, 0.14));
+  --site-form-surface: var(--site-surface-color, #ffffff);
+  --site-form-surface-soft: var(--site-surface-soft-color, #f5f8fc);
+  --site-form-text: var(--site-text-color, #111827);
+  --site-form-muted: var(--site-muted-color, #4b5563);
+  --site-form-heading: var(--site-heading-color, #0f172a);
+  --site-form-accent: var(--site-accent-color, var(--accent-color, #0d6efd));
+  --site-form-accent-contrast: var(--site-accent-contrast, #ffffff);
+  --site-form-shadow: var(--site-shadow-soft, 0 24px 50px -36px rgba(15, 23, 42, 0.45));
+}
+
+.nf-form-cont .nf-form-wrap {
+  border: 1px solid var(--site-form-border);
+  border-radius: var(--site-form-radius);
+  background: linear-gradient(180deg, #ffffff 0%, var(--site-form-surface-soft) 100%);
+  box-shadow: var(--site-form-shadow);
+  padding: clamp(1.25rem, 2.6vw, 2rem);
+}
+
+.site-card .nf-form-cont .nf-form-wrap,
+.site-card .nf-form-cont .nf-form-content {
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  padding: 0;
+}
+
+.nf-form-cont .nf-before-form-content,
+.nf-form-cont .nf-after-form-content {
+  margin: 0 0 1rem;
+  color: var(--site-form-muted);
+}
+
+.nf-form-cont .nf-form-content {
+  display: grid;
+  gap: 1rem;
+  margin: 0;
+  padding: 0;
+}
+
+.nf-form-cont .nf-field-container {
+  margin: 0;
+}
+
+.nf-form-cont .nf-field-label label,
+.nf-form-cont .field-wrap > label,
+.nf-form-cont .list-label,
+.nf-form-cont .nf-label-span {
+  display: inline-block;
+  margin-bottom: 0.45rem;
+  color: var(--site-form-heading);
+  font-size: 0.95rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+}
+
+.nf-form-cont .nf-field-description,
+.nf-form-cont .nf-field-description p,
+.nf-form-cont .nf-error-msg,
+.nf-form-cont .ninja-forms-req-symbol,
+.nf-form-cont .nf-description {
+  color: var(--site-form-muted);
+}
+
+.nf-form-cont .nf-element,
+.nf-form-cont input:not([type="button"]):not([type="submit"]):not([type="checkbox"]):not([type="radio"]),
+.nf-form-cont select,
+.nf-form-cont textarea {
+  width: min(100%, 36rem);
+  min-height: 3.25rem;
+  border: 1px solid var(--site-form-border);
+  border-radius: var(--site-form-radius-sm);
+  background: var(--site-form-surface);
+  color: var(--site-form-text);
+  box-shadow: inset 0 1px 1px rgba(15, 23, 42, 0.03);
+  padding: 0.9rem 1rem;
+  font-size: 1rem;
+  line-height: 1.35;
+  transition: border-color 0.16s ease, box-shadow 0.16s ease, transform 0.16s ease;
+}
+
+.nf-form-cont textarea,
+.nf-form-cont .textboxarea-wrap .nf-element,
+.nf-form-cont .textarea-wrap .nf-element {
+  width: 100%;
+  min-height: 10rem;
+  resize: vertical;
+}
+
+.nf-form-cont select,
+.nf-form-cont .listselect-wrap .nf-element {
+  appearance: none;
+  background-image: linear-gradient(45deg, transparent 50%, #6b7280 50%), linear-gradient(135deg, #6b7280 50%, transparent 50%);
+  background-position: calc(100% - 18px) calc(50% - 2px), calc(100% - 12px) calc(50% - 2px);
+  background-size: 6px 6px, 6px 6px;
+  background-repeat: no-repeat;
+  padding-right: 2.75rem;
+}
+
+.nf-form-cont .nf-element::placeholder,
+.nf-form-cont input::placeholder,
+.nf-form-cont textarea::placeholder {
+  color: color-mix(in srgb, var(--site-form-muted) 72%, #ffffff);
+}
+
+.nf-form-cont .nf-element:focus,
+.nf-form-cont input:focus,
+.nf-form-cont select:focus,
+.nf-form-cont textarea:focus {
+  outline: none;
+  border-color: var(--site-form-accent);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--site-form-accent) 16%, transparent);
+}
+
+.nf-form-cont .checkbox-wrap .nf-field-element,
+.nf-form-cont .listcheckbox-wrap .nf-field-element,
+.nf-form-cont .listradio-wrap .nf-field-element {
+  display: grid;
+  gap: 0.65rem;
+  padding: 0.9rem 1rem;
+  border: 1px solid var(--site-form-border);
+  border-radius: var(--site-form-radius-sm);
+  background: var(--site-form-surface);
+}
+
+.nf-form-cont .checkbox-wrap .nf-field-element label,
+.nf-form-cont .listcheckbox-wrap .nf-field-element label,
+.nf-form-cont .listradio-wrap .nf-field-element label {
+  color: var(--site-form-text);
+  font-weight: 500;
+}
+
+.nf-form-cont .checkbox-wrap .nf-field-element input,
+.nf-form-cont .listcheckbox-wrap .nf-field-element input,
+.nf-form-cont .listradio-wrap .nf-field-element input {
+  width: auto;
+  min-height: 0;
+  margin-right: 0.55rem;
+}
+
+.nf-form-cont .submit-wrap {
+  margin-top: 0.35rem;
+}
+
+.nf-form-cont input[type="button"],
+.nf-form-cont input[type="submit"],
+.nf-form-cont button,
+.nf-form-cont .nf-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 3.15rem;
+  border: 1px solid var(--site-form-accent) !important;
+  border-radius: 999px !important;
+  background: var(--site-form-accent) !important;
+  color: var(--site-form-accent-contrast) !important;
+  box-shadow: 0 12px 26px -18px rgba(15, 23, 42, 0.5);
+  padding: 0.9rem 1.4rem !important;
+  font-size: 0.98rem;
+  font-weight: 700;
+  line-height: 1.1;
+  text-decoration: none;
+  transition: transform 0.16s ease, filter 0.16s ease, box-shadow 0.16s ease;
+}
+
+.nf-form-cont input[type="button"]:hover,
+.nf-form-cont input[type="submit"]:hover,
+.nf-form-cont button:hover,
+.nf-form-cont .nf-button:hover {
+  transform: translateY(-1px);
+  filter: brightness(0.97);
+  box-shadow: 0 18px 34px -22px rgba(15, 23, 42, 0.58);
+}
+
+.nf-form-cont .nf-response-msg,
+.nf-form-cont .nf-error-msg,
+.nf-form-cont .ninja-forms-field-error,
+.nf-form-cont .nf-pass.field-wrap .nf-field-element:after {
+  font-size: 0.92rem;
+}
+
+.nf-form-cont .nf-response-msg {
+  border: 1px solid var(--site-form-border);
+  border-radius: var(--site-form-radius-sm);
+  background: var(--site-form-surface);
+  padding: 0.9rem 1rem;
+}
+
+@media (min-width: 768px) {
+  .nf-form-cont .firstname-container .nf-element,
+  .nf-form-cont .lastname-container .nf-element,
+  .nf-form-cont .email-container .nf-element,
+  .nf-form-cont .phone-container .nf-element,
+  .nf-form-cont .textbox-container .nf-element,
+  .nf-form-cont .text-container .nf-element,
+  .nf-form-cont .listselect-wrap .nf-element {
+    width: min(100%, 32rem);
+  }
+}
+
+@media (max-width: 767px) {
+  .nf-form-cont .nf-form-wrap {
+    padding: 1rem;
+    border-radius: var(--site-form-radius-sm);
+  }
+
+  .nf-form-cont .nf-element,
+  .nf-form-cont input:not([type="button"]):not([type="submit"]):not([type="checkbox"]):not([type="radio"]),
+  .nf-form-cont select,
+  .nf-form-cont textarea {
+    width: 100%;
+  }
+}
