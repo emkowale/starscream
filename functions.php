@@ -29,6 +29,7 @@ starscream_require('inc/admin/customizer.php');       // creates section + loads
 
 /** Frontend (shop-as-home hero + tweaks) */
 starscream_require('inc/frontend/announcement-bar.php');
+starscream_require('inc/frontend/popup-store.php');
 starscream_require('inc/frontend/hero.php');
 starscream_require('inc/frontend/tbt-slider.php');
 starscream_require('inc/frontend/tbt-googlereviews.php');

@@ -72,6 +72,15 @@ add_action('wp_enqueue_scripts', function () {
       filemtime($announcement_css)
     );
   }
+  $popup_store_css = starscream_locate('assets/css/popup-store.css');
+  if ($popup_store_css && file_exists($popup_store_css)) {
+    wp_enqueue_style(
+      'starscream-popup-store',
+      starscream_asset_uri('assets/css/popup-store.css'),
+      ['starscream-base', 'starscream-header'],
+      filemtime($popup_store_css)
+    );
+  }
   wp_enqueue_style('starscream-footer', starscream_asset_uri('assets/css/footer.css'), ['starscream-header'], wp_get_theme()->get('Version'));
   wp_enqueue_style('starscream-banners', starscream_asset_uri('assets/css/banners.css'), [], $v);
   wp_enqueue_style('starscream-cart', starscream_asset_uri('assets/css/cart.css'), [], $v);
@@ -83,6 +92,17 @@ add_action('wp_enqueue_scripts', function () {
       starscream_asset_uri('assets/js/announcement-bar.js'),
       [],
       filemtime($announcement_js),
+      true
+    );
+  }
+
+  $popup_store_js = starscream_locate('assets/js/popup-store.js');
+  if ($popup_store_js && file_exists($popup_store_js)) {
+    wp_enqueue_script(
+      'starscream-popup-store',
+      starscream_asset_uri('assets/js/popup-store.js'),
+      [],
+      filemtime($popup_store_js),
       true
     );
   }

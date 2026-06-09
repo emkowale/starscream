@@ -72,4 +72,6 @@
   </div>
 </header>
 
+<?php if (function_exists('starscream_render_popup_store_banner')) starscream_render_popup_store_banner(); ?>
+
 <?php if (function_exists('starscream_render_header_slider')) starscream_render_header_slider(); ?>
