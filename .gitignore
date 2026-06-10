@@ -4,6 +4,11 @@
 # IDE
 .vscode/
 .idea/
+.codex
+
+# Release scratch files
+.release_notes.tmp
+.fuse_hidden*
 
 # Build artifacts & zips
 node_modules/

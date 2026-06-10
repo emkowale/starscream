@@ -26,10 +26,26 @@ SOURCE_OF_TRUTH_MODE=1
 
 EXCLUDES=(
   ".git/"
+  ".gitignore"
+  ".gitcliff.toml"
+  ".codex"
+  ".release_notes.tmp"
+  ".fuse_hidden*"
+  "release.sh"
   "artifacts/"
   "package/"
   ".github/"
   ".DS_Store"
+  ".vscode/"
+  ".idea/"
+  "node_modules/"
+  "vendor/"
+  "*.log"
+  "*.zip"
+  "*.map"
+  "dist/"
+  "build/"
+  ".cache/"
 )
 
 # ==== UI ======================================================================
