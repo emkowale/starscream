@@ -37,6 +37,7 @@ add_action('wp_head', function () {
   $accent     = $hex(get_theme_mod('accent_color', '#0073aa'), '#0073aa');
   $announcement_bg  = $hex(get_theme_mod('announcement_bar_bg_color', '#151515'), '#151515');
   $announcement_txt = $contrast($announcement_bg);
+  $announcement_active = function_exists('starscream_is_announcement_bar_active') && starscream_is_announcement_bar_active();
 
   $font_stack = '"' . trim( (string) get_theme_mod('header_footer_font', 'Inter') ) . '", system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif';
 
@@ -49,6 +50,7 @@ add_action('wp_head', function () {
       .'--accent-color:'.$accent.';'
       .'--announcement-bar-bg-color:'.$announcement_bg.';'
       .'--announcement-bar-text-color:'.$announcement_txt.';'
+      .($announcement_active ? '--btx-announcement-height:40px;--btx-header-top-offset:40px;' : '')
       .'--header-footer-font:'.$font_stack.';'
       .'}</style>';
 }, 98);

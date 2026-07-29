@@ -29,13 +29,27 @@ if (!function_exists('starscream_get_announcement_items')) {
   }
 }
 
+if (!function_exists('starscream_is_announcement_bar_active')) {
+  function starscream_is_announcement_bar_active() {
+    if (is_admin()) return false;
+    if (!get_theme_mod('announcement_bar_enabled', false)) return false;
+
+    return count(starscream_get_announcement_items()) > 0;
+  }
+}
+
+add_filter('body_class', function ($classes) {
+  if (starscream_is_announcement_bar_active()) {
+    $classes[] = 'btx-announcement-bar-active';
+  }
+  return $classes;
+}, 20);
+
 if (!function_exists('starscream_render_announcement_bar')) {
   function starscream_render_announcement_bar() {
-    if (is_admin()) return;
-    if (!get_theme_mod('announcement_bar_enabled', false)) return;
+    if (!starscream_is_announcement_bar_active()) return;
 
     $items = starscream_get_announcement_items();
-    if (!$items) return;
 
     echo '<div class="btx-announcement-bar" data-announcement-bar="1" role="region" aria-label="Announcement bar">';
     echo '<div class="btx-announcement-bar__inner">';

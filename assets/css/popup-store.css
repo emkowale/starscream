@@ -48,6 +48,14 @@ body.btx-popup-store-active .btx-site-header + .btx-popup-store-banner {
   margin-top: 0 !important;
 }
 
+/* WooCommerce renders single-product content without a <main> wrapper. The
+   fixed banner sits between the header and its notices/product markup, so use
+   the notices wrapper to reserve the combined header and banner space. */
+body.single-product.btx-popup-store-active
+  .btx-popup-store-banner + .woocommerce-notices-wrapper {
+  margin-top: calc(var(--btx-header-height, 0px) + var(--btx-popup-store-height, 0px) + 20px);
+}
+
 body.btx-popup-store-active .btx-header-slider {
   margin-top: calc(var(--btx-slider-announcement-offset, 0px) + var(--btx-popup-store-height, 0px));
 }
@@ -57,6 +65,11 @@ body.btx-popup-store-active.btx-transparent-header-enabled.home main {
 }
 
 @media (max-width: 768px) {
+  body.single-product.btx-popup-store-active
+    .btx-popup-store-banner + .woocommerce-notices-wrapper {
+    margin-top: calc(var(--btx-header-height, 0px) + var(--btx-popup-store-height, 0px) + 10px);
+  }
+
   .btx-popup-store-banner__inner {
     min-height: 66px;
     padding: 9px 12px;

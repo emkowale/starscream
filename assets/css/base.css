@@ -35,12 +35,17 @@ body.btx-transparent-header-enabled.home main {
   margin: calc(0px - var(--btx-header-height, 0px)) 20px 20px;
 }
 
+body.btx-announcement-bar-active.btx-transparent-header-enabled.home main {
+  margin-top: 0;
+}
+
 @media (max-width:768px){
   main { margin: calc(var(--btx-header-height, 0px) + var(--btx-popup-store-height, 0px) + 10px) 10px 10px; }
   body:not(.home) .btx-site-header + :not(main) {
     margin-top: calc(var(--btx-header-height, 0px) + var(--btx-popup-store-height, 0px) + 10px);
   }
   body.btx-transparent-header-enabled.home main { margin: calc(0px - var(--btx-header-height, 0px)) 10px 10px; }
+  body.btx-announcement-bar-active.btx-transparent-header-enabled.home main { margin-top: 0; }
   h1,
   .woocommerce-result-count,
   .woocommerce-ordering,
