@@ -1,0 +1,16 @@
+/* Product cards */
+.woocommerce ul.products li.product{ text-align:center; font-family:var(--header-footer-font); }
+
+.btx-card-media{
+  position:relative; aspect-ratio:var(--btx-thumb-aspect, 5/7);
+  background:#f7f7f7; border-radius:8px; overflow:hidden;
+}
+.btx-uncropped-thumbs .btx-card-media{ aspect-ratio:auto; }
+.btx-card-img{ width:100%; height:100%; object-fit:contain; display:block; }
+
+.btx-card-title{ font-size:1.05rem; line-height:1.35; margin:14px 0 6px; }
+.btx-card-title a{ text-decoration:none; }
+.btx-card-price{ font-size:1rem; font-weight:600; margin-bottom:2px; }
+
+/* Use our own link */
+.btx-product-card .woocommerce-loop-product__link{ display:none; }

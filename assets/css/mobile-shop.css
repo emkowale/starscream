@@ -1,0 +1,16 @@
+/* Mobile shop grid: 1 col + bigger text */
+@media (max-width:767px){
+  .woocommerce ul.products{
+    display:grid !important; grid-template-columns:1fr !important; gap:28px !important;
+    padding-left:12px; padding-right:12px;
+  }
+  .woocommerce ul.products li.product{
+    width:100% !important; margin:0 auto !important; float:none !important; text-align:center !important;
+  }
+  .woocommerce ul.products li.product .btx-card-media{ width:100% !important; max-width:100% !important; margin-left:auto; margin-right:auto; }
+  .woocommerce ul.products li.product .woocommerce-LoopProduct-link img{
+    width:100% !important; height:auto !important; display:block; margin:0 auto;
+  }
+  .btx-card-title{ font-size:1.2rem !important; }
+  .btx-card-price{ font-size:1.05rem !important; }
+}

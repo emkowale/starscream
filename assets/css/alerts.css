@@ -1,0 +1,114 @@
+/* Styled replacement for native JS alerts */
+.btx-alert-backdrop{
+  position:fixed; inset:0; z-index:9999;
+  display:flex; align-items:center; justify-content:center;
+  padding:28px 18px; gap:0;
+  background:radial-gradient(circle at 30% 20%, rgba(255,255,255,0.06), rgba(255,255,255,0)) , rgba(0,0,0,0.55);
+  backdrop-filter:blur(2px);
+  opacity:0; pointer-events:none;
+  transition:opacity .16s ease;
+}
+.btx-alert-backdrop.is-visible{ opacity:1; pointer-events:auto; }
+body.btx-alert-locked{ overflow:hidden; }
+
+.btx-alert{
+  width:min(440px, 100%);
+  background:linear-gradient(135deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02)), var(--header-bg-color,#0e0f13);
+  color:var(--header-text-color,#0d0d0d);
+  border:1px solid rgba(0,0,0,0.2);
+  box-shadow:0 16px 50px rgba(0,0,0,0.35), 0 1px 0 rgba(255,255,255,0.04) inset;
+  border-radius:18px;
+  padding:18px 18px 16px;
+  position:relative;
+  transform:translateY(8px) scale(.98);
+  transition:transform .18s ease, box-shadow .18s ease;
+  font-family:var(--header-footer-font, "Inter", system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif);
+}
+.btx-alert-backdrop.is-visible .btx-alert{ transform:translateY(0) scale(1); box-shadow:0 24px 70px rgba(0,0,0,0.42); }
+
+.btx-alert__spark{
+  position:absolute; inset:0; top:-1px; height:5px; width:100%;
+  background:linear-gradient(120deg, var(--accent-color,#ffc107), rgba(255,255,255,0.6), var(--accent-color,#ffc107));
+  border-radius:18px 18px 12px 12px;
+  box-shadow:0 8px 20px rgba(0,0,0,0.2);
+}
+
+.btx-alert__header{
+  display:flex; align-items:center; gap:12px;
+  margin-bottom:10px;
+}
+.btx-alert__badge{
+  width:44px; height:44px; border-radius:14px;
+  background:var(--accent-color,#ffc107);
+  color:var(--btx-accent-text,#111);
+  display:grid; place-items:center;
+  font-weight:800; font-size:20px;
+  box-shadow:0 10px 22px rgba(0,0,0,0.25), 0 0 0 1px rgba(255,255,255,0.25);
+}
+.btx-alert__titles{ flex:1; }
+.btx-alert__eyebrow{
+  text-transform:uppercase; letter-spacing:0.08em;
+  font-size:11px; font-weight:700;
+  color:var(--header-text-color,#111);
+  opacity:0.65;
+}
+.btx-alert__title{
+  margin:3px 0 0;
+  font-size:20px; font-weight:800; line-height:1.2;
+}
+.btx-alert__close{
+  background:rgba(255,255,255,0.04);
+  color:var(--header-text-color,#111);
+  border:1px solid rgba(255,255,255,0.12);
+  width:38px; height:38px; border-radius:12px;
+  display:grid; place-items:center;
+  cursor:pointer;
+  transition:background .12s ease, transform .12s ease, border-color .12s ease;
+}
+.btx-alert__close:hover{ background:rgba(255,255,255,0.08); transform:translateY(-1px); border-color:rgba(255,255,255,0.2); }
+.btx-alert__close:focus-visible,
+.btx-alert__action:focus-visible{
+  outline:2px solid var(--accent-color,#ffc107);
+  outline-offset:2px;
+}
+
+.btx-alert__body{
+  margin:0 4px 6px;
+  font-size:16px; line-height:1.6;
+  color:var(--header-text-color,#111);
+  white-space:pre-line;
+}
+.btx-alert__actions{
+  margin-top:12px;
+  display:flex; justify-content:flex-end; gap:10px;
+}
+.btx-alert__action{
+  background:var(--accent-color,#ffc107);
+  color:var(--btx-accent-text,#111);
+  border:0; border-radius:12px;
+  padding:11px 18px;
+  font-weight:800; letter-spacing:0.01em;
+  cursor:pointer;
+  box-shadow:0 12px 30px rgba(0,0,0,0.22), 0 1px 0 rgba(255,255,255,0.12) inset;
+  transition:transform .12s ease, filter .12s ease, box-shadow .12s ease;
+}
+.btx-alert__action:hover{ filter:brightness(0.96); transform:translateY(-1px); box-shadow:0 16px 36px rgba(0,0,0,0.26); }
+.btx-alert__action:active{ transform:translateY(0); filter:brightness(0.93); }
+
+@media (max-width:600px){
+  .btx-alert{
+    padding:16px 14px 14px;
+    border-radius:16px;
+  }
+  .btx-alert__header{ align-items:flex-start; }
+  .btx-alert__badge{ width:40px; height:40px; font-size:18px; }
+  .btx-alert__title{ font-size:18px; }
+}
+
+@media (prefers-reduced-motion:reduce){
+  .btx-alert-backdrop,
+  .btx-alert,
+  .btx-alert__action,
+  .btx-alert__close{ transition:none !important; }
+  .btx-alert{ transform:none !important; }
+}

@@ -1,0 +1,79 @@
+.btx-announcement-bar {
+  position: relative;
+  z-index: 4000;
+  overflow: hidden;
+  background-color: var(--announcement-bar-bg-color, #151515);
+  color: var(--announcement-bar-text-color, #ffffff);
+  font-family: var(--header-footer-font);
+}
+
+.btx-announcement-bar__inner {
+  overflow: hidden;
+  width: 100%;
+}
+
+.btx-announcement-bar__track {
+  display: flex;
+  align-items: center;
+  width: max-content;
+  min-width: 100%;
+  animation: btx-announcement-marquee 24s linear infinite;
+  will-change: transform;
+}
+
+.btx-announcement-bar__group {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.btx-announcement-bar__item {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1;
+  padding: 10px 26px;
+}
+
+.btx-announcement-bar__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+}
+
+.btx-announcement-bar__icon svg {
+  width: 20px;
+  height: 20px;
+  display: block;
+  fill: currentColor;
+}
+
+.btx-announcement-bar:hover .btx-announcement-bar__track,
+.btx-announcement-bar:focus-within .btx-announcement-bar__track,
+.btx-announcement-bar.is-paused .btx-announcement-bar__track {
+  animation-play-state: paused;
+}
+
+@keyframes btx-announcement-marquee {
+  0% { transform: translate3d(0, 0, 0); }
+  100% { transform: translate3d(-50%, 0, 0); }
+}
+
+@media (max-width: 768px) {
+  .btx-announcement-bar__item {
+    padding: 10px 18px;
+    font-size: 13px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .btx-announcement-bar__track {
+    animation: none;
+    transform: none;
+  }
+}

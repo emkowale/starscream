@@ -1,0 +1,100 @@
+/*
+ * WooCommerce foundation layer for Starscream.
+ * Keeps styling generic so affiliates can adapt via CSS vars and child themes.
+ */
+
+.woocommerce,
+.woocommerce-page {
+  --site-woo-radius: var(--site-radius-sm, 12px);
+  --site-woo-border: var(--site-border-color, rgba(15, 23, 42, 0.14));
+  --site-woo-surface: var(--site-surface-color, #ffffff);
+  --site-woo-surface-soft: var(--site-surface-soft-color, #f5f8fc);
+}
+
+.woocommerce .woocommerce-notices-wrapper > *,
+.woocommerce .woocommerce-info,
+.woocommerce .woocommerce-message,
+.woocommerce .woocommerce-error {
+  border: 1px solid var(--site-woo-border);
+  border-radius: var(--site-woo-radius);
+  background: var(--site-woo-surface-soft);
+  box-shadow: none;
+}
+
+.woocommerce table.shop_table,
+.woocommerce-page table.shop_table {
+  border-color: var(--site-woo-border);
+  border-radius: var(--site-woo-radius);
+  background: var(--site-woo-surface);
+  overflow: hidden;
+}
+
+.woocommerce .cart_totals,
+.woocommerce .woocommerce-checkout-review-order table.shop_table {
+  border: 1px solid var(--site-woo-border);
+  border-radius: var(--site-woo-radius);
+  background: var(--site-woo-surface);
+}
+
+.woocommerce form .form-row input.input-text,
+.woocommerce form .form-row textarea,
+.woocommerce form .form-row select,
+.woocommerce-page form .form-row input.input-text,
+.woocommerce-page form .form-row textarea,
+.woocommerce-page form .form-row select {
+  border-radius: var(--site-woo-radius);
+  border: 1px solid var(--site-woo-border);
+  background: #ffffff;
+}
+
+.woocommerce form .form-row input.input-text:focus,
+.woocommerce form .form-row textarea:focus,
+.woocommerce form .form-row select:focus,
+.woocommerce-page form .form-row input.input-text:focus,
+.woocommerce-page form .form-row textarea:focus,
+.woocommerce-page form .form-row select:focus {
+  border-color: var(--site-accent-color, #0d6efd);
+  box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.14);
+  outline: none;
+}
+
+.woocommerce-account .woocommerce-MyAccount-navigation ul {
+  list-style: none;
+  margin: 0 0 1rem;
+  padding: 0;
+  display: grid;
+  gap: 0.45rem;
+}
+
+.woocommerce-account .woocommerce-MyAccount-navigation a {
+  display: block;
+  border: 1px solid var(--site-woo-border);
+  border-radius: var(--site-woo-radius);
+  padding: 0.62rem 0.85rem;
+  text-decoration: none;
+}
+
+.woocommerce-account .woocommerce-MyAccount-navigation .is-active a {
+  border-color: var(--site-accent-color, #0d6efd);
+  background: var(--site-woo-surface-soft);
+}
+
+.woocommerce-account .woocommerce-MyAccount-content,
+.woocommerce-cart .woocommerce,
+.woocommerce-checkout .woocommerce {
+  border-radius: var(--site-woo-radius);
+}
+
+.single-product .variations_form .bt-hide-variations-marker ~ .variations {
+  display: none !important;
+}
+
+.single-product .variations_form .bt-hide-variations-marker {
+  display: none;
+}
+
+@media (max-width: 767px) {
+  .woocommerce-account .woocommerce-MyAccount-navigation ul {
+    grid-template-columns: 1fr;
+  }
+}
