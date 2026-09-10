@@ -96,33 +96,14 @@ if ( $is_shop_front ) {
         echo '<h1 class="page-title">' . woocommerce_page_title(false) . '</h1>';
     }
 
-    // Build a product query explicitly using WooCommerce's catalog ordering rules.
-    $ordering_args = function_exists('WC') && WC()->query
-        ? WC()->query->get_catalog_ordering_args()
-        : ['orderby' => 'menu_order title', 'order' => 'ASC', 'meta_key' => ''];
-    $paged = max(1, (int) get_query_var('paged', 0), (int) get_query_var('page', 0));
-    $args  = [
-        'post_type'   => 'product',
-        'post_status' => 'publish',
-        'paged'       => $paged,
-        'orderby'     => $ordering_args['orderby'] ?? 'menu_order title',
-        'order'       => $ordering_args['order'] ?? 'ASC',
-    ];
-    if ( ! empty( $ordering_args['meta_key'] ) ) {
-        $args['meta_key'] = $ordering_args['meta_key'];
-    }
-    $loop = new WP_Query($args);
-
-    if ( $loop->have_posts() ) {
+    if ( woocommerce_product_loop() ) {
         woocommerce_product_loop_start();
-        while ( $loop->have_posts() ) {
-            $loop->the_post();
+        while ( have_posts() ) {
+            the_post();
             do_action('woocommerce_shop_loop');
             wc_get_template_part('content', 'product');
         }
         woocommerce_product_loop_end();
-
-        wp_reset_postdata();
 
         // Use WooCommerce's built-in pagination output.
         do_action('woocommerce_after_shop_loop');

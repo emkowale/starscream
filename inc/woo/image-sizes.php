@@ -18,7 +18,8 @@ add_action('after_setup_theme', function () {
 
 add_filter('woocommerce_get_image_size_single', function($size){
   $w = (int) get_option('woocommerce_single_image_width', 500);
-  return ['width' => max(200, $w), 'height' => max(200, $w), 'crop' => 1];
+  // Product detail images must retain the complete garment and artwork.
+  return ['width' => max(200, $w), 'height' => 0, 'crop' => 0];
 }, 10);
 
 add_filter('woocommerce_get_image_size_thumbnail', function($size){

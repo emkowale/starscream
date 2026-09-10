@@ -335,7 +335,6 @@ RSYNC_EXCLUDES=(
   --exclude "package/"
   --exclude ".github/"
   --exclude ".DS_Store"
-  --exclude "release.sh"
 )
 rsync -a --delete "${RSYNC_EXCLUDES[@]}" ./ "$PKG_DIR/"
 ( cd "package" && zip -qr "../${ART_DIR}/${ZIP_NAME}" "${THEME_SLUG}" )

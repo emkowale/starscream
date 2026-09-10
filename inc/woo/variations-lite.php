@@ -22,6 +22,19 @@ if (!function_exists('starscream_get_single_purchasable_variation')) {
   }
 }
 
+/* Show only the dynamic variation price for variable products on single-product pages */
+add_action('wp', function () {
+  if (!function_exists('is_product') || !is_product() || !function_exists('wc_get_product')) return;
+
+  $product_id = get_queried_object_id();
+  if (!$product_id) return;
+
+  $product = wc_get_product($product_id);
+  if (!$product instanceof WC_Product_Variable) return;
+
+  remove_action('woocommerce_single_product_summary', 'woocommerce_template_single_price', 10);
+}, 20);
+
 /* Prefer a sensible selection if none chosen */
 add_filter('woocommerce_dropdown_variation_attribute_options_args', function ($args) {
   if (empty($args['product']) || empty($args['attribute'])) return $args;

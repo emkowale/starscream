@@ -36,6 +36,7 @@ if (!function_exists('starscream_customizer_require')) {
 foreach ([
   'inc/admin/customizer/helpers.php',
   'inc/admin/customizer/colors.php',
+  'inc/admin/customizer/shipping.php',
   'inc/admin/customizer/popup_store.php',
   'inc/admin/customizer/announcement_bar.php',
   'inc/admin/customizer/fonts.php',
@@ -74,6 +75,7 @@ if (!function_exists('starscream_customizer_require')) {
 $parts = [
   'inc/admin/customizer/helpers.php',
   'inc/admin/customizer/colors.php',       // header_bg, footer_bg, header_text, footer_text, accent
+  'inc/admin/customizer/shipping.php',     // shipping method toggles and thresholds
   'inc/admin/customizer/popup_store.php',
   'inc/admin/customizer/announcement_bar.php',
   'inc/admin/customizer/fonts.php',        // header_footer_font
