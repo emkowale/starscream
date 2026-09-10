@@ -1,5 +1,12 @@
 ## v1.4.68 - 2025-12-06
 
+## [1.5.15] - 2026-09-10
+
+### Changes
+* Sync live store fixes and retain release tooling (557c8d9)
+* chore(release): v1.5.14 (b14afbd)
+
+
 ## [1.5.14] - 2026-08-20
 
 ### Changes
