@@ -1,5 +1,10 @@
 ## v1.4.68 - 2025-12-06
 
+## [1.5.16] - 2026-11-13
+
+### Changes
+* Disable WordPress comments and pingbacks for storefront sites.
+
 ## [1.5.15] - 2026-09-10
 
 ### Changes

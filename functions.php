@@ -114,3 +114,6 @@ starscream_require('inc/theme/permalinks.php');
 
 // Rename default "Uncategorized" category to "General" with slug "general"
 starscream_require('inc/theme/default-category.php');
+
+// Storefronts do not accept public comments or pingbacks.
+starscream_require('inc/theme/disable-comments.php');
